@@ -33,11 +33,11 @@
 
 @protocol CWCollectionDataSource <NSObject>
 
-typedef void (^LMCollectionPrepareResult)(id <CWCollectionModelProtocol> model, id data);
+typedef void (^CWCollectionPrepareResult)(id <CWCollectionModelProtocol> model, id data);
 
 @required
 
-- (void)collection:(CWCollection *)collection prepareModelWithData:(id)data completion:(LMCollectionPrepareResult)completionBlock;
+- (void)collection:(CWCollection *)collection prepareModelWithData:(id)data completion:(CWCollectionPrepareResult)completionBlock;
 
 @optional
 
