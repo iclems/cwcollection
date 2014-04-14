@@ -26,6 +26,18 @@ Any CWCollection must have a dataSource which transforms a received data object 
   - (void)collection:(CWCollection *)collection prepareModelWithData:(id)data completion:(LMCollectionPrepareResult)completionBlock;
   - (NSComparisonResult)collection:(CWCollection *)collection sortCompareModel:(id <CWCollectionModelProtocol>)model1 withModel:(id <CWCollectionModelProtocol>)model2;
 ```
+
+The `collection:prepareModelWithData:completion:` async enables to load "references" collection, and automatically retrieving the referenced object. 
+
+Basic example (without reference): 
+```
+- (void)collection:(CWCollection *)collection prepareModelWithData:(FDataSnapshot*)snapshot completion:(LMCollectionPrepareResult)completionBlock;
+{
+    LMPanel *panel = [LMPanel panelWithDictionary:snapshot.valueInExportFormat projectReference:_reference];
+    completionBlock(panel, snapshot);
+}
+```
+
 CWCollectionDelegate
 --
 
