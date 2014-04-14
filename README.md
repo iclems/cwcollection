@@ -10,8 +10,7 @@ A Firebase collection can either be represented:
 - progressive loading by batch, with parallel new child support
 
 The main requirement is that the model needs to correspond to CWCollectionModelProtocol: it must have an `identifier`, and provide NSDictionary binding:
-`
-- (NSString *)identifier;
-- (NSDictionary *)dictionary;
-- (void)updateWithDictionary:(NSDictionary *)dictionary;
-`
+  
+  - (NSString *)identifier;
+  - (NSDictionary *)dictionary;
+  - (void)updateWithDictionary:(NSDictionary *)dictionary;
