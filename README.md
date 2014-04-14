@@ -27,7 +27,7 @@ Any CWCollection must have a dataSource which transforms a received data object 
   - (NSComparisonResult)collection:(CWCollection *)collection sortCompareModel:(id <CWCollectionModelProtocol>)model1 withModel:(id <CWCollectionModelProtocol>)model2;
 ```
 
-The `collection:prepareModelWithData:completion:` async enables to load "references" collection, and automatically retrieving the referenced object. 
+For instance, the `collection:prepareModelWithData:completion:` async enables to load "references" collection, and properly retrieve the referenced object. 
 
 Basic example (without reference): 
 ```
