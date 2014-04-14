@@ -34,7 +34,7 @@ Basic example (without reference):
 - (void)collection:(CWCollection *)collection prepareModelWithData:(FDataSnapshot*)snapshot completion:(LMCollectionPrepareResult)completionBlock;
 {
     LMPanel *panel = [LMPanel panelWithDictionary:snapshot.valueInExportFormat projectReference:_reference];
-    completionBlock(panel, snapshot);
+    completionBlock(panel);
 }
 ```
 
