@@ -13,24 +13,24 @@ CWCollectionModelProtocol
 --
 
 The main requirement is that the model needs to correspond to `CWCollectionModelProtocol`:
-  
+```
   - (NSString *)identifier;
   - (NSDictionary *)dictionary;
   - (void)updateWithDictionary:(NSDictionary *)dictionary;
-
+```
 CWCollectionDataSource
 --
 
 Any CWCollection must have a dataSource which transforms a received data object into a model instance. The dataSource can also optionally provide a sort comparator (the collection will automatically be kept sorted):
-
+```
   - (void)collection:(CWCollection *)collection prepareModelWithData:(id)data completion:(LMCollectionPrepareResult)completionBlock;
   - (NSComparisonResult)collection:(CWCollection *)collection sortCompareModel:(id <CWCollectionModelProtocol>)model1 withModel:(id <CWCollectionModelProtocol>)model2;
-
+```
 CWCollectionDelegate
 --
 
 The CWCollection delegate(s) provides method meant to be close to UITableView, UICollectionView, etc. and status update regarding the loading state:
-
+```
   - (void)collection:(CWCollection *)collection modelAdded:(id<CWCollectionModelProtocol>)model atIndex:(NSUInteger)index;
   - (void)collection:(CWCollection *)collection modelRemoved:(id <CWCollectionModelProtocol>)model atIndex:(NSUInteger)index;
   - (void)collection:(CWCollection *)collection modelUpdated:(id <CWCollectionModelProtocol>)model atIndex:(NSUInteger)index;
@@ -38,7 +38,7 @@ The CWCollection delegate(s) provides method meant to be close to UITableView, U
   
   - (void)collectionDidStartLoad:(CWCollection *)collection;
   - (void)collectionDidEndLoad:(CWCollection *)collection;
-
+```
 Firebase: CWFirebaseCollection
 --
 
