@@ -151,7 +151,7 @@
             
             preparedCount++;
             
-            if (preparedCount == totalCount)
+            if (preparedCount >= totalCount)
             {
                 this.isLoading = NO;
                 
@@ -185,7 +185,7 @@
             enumIndex++;
         }
         
-        if (!snapshot.children) {
+        if (!snapshot.childrenCount) {
             completionBlock(nil, snapshot);
         }
     }];
