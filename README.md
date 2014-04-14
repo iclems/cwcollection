@@ -23,7 +23,7 @@ CWCollectionDataSource
 
 Any CWCollection must have a dataSource which transforms a received data object into a model instance. The dataSource can also optionally provide a sort comparator (the collection will automatically be kept sorted):
 ```
-  - (void)collection:(CWCollection *)collection prepareModelWithData:(id)data completion:(LMCollectionPrepareResult)completionBlock;
+  - (void)collection:(CWCollection *)collection prepareModelWithData:(id)data completion:(CWCollectionPrepareResult)completionBlock;
   - (NSComparisonResult)collection:(CWCollection *)collection sortCompareModel:(id <CWCollectionModelProtocol>)model1 withModel:(id <CWCollectionModelProtocol>)model2;
 ```
 
