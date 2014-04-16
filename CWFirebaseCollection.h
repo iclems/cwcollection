@@ -42,5 +42,6 @@
 - (void)startListeningForNew;
 - (void)startListeningForChange;
 - (void)startListeningForMove;
+- (void)startListeningForRemove;
 
 @end

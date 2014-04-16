@@ -177,8 +177,11 @@
                 [this updateModel:model silent:YES];
             }
             
-            if (preparedSnapshots[snapshot.name]) return;
-            else [preparedSnapshots setObject:@(YES) forKey:snapshot.name];
+            // If collection is empty, no snapshot
+            if (snapshot) {
+                if (preparedSnapshots[snapshot.name]) return;
+                else [preparedSnapshots setObject:@(YES) forKey:snapshot.name];
+            }
             
             if (preparedSnapshots.count == totalCount)
             {
@@ -218,7 +221,7 @@
         }
         
         if (!snapshot.childrenCount) {
-            completionBlock(nil, snapshot);
+            completionBlock(nil, nil);
         }
     }];
 }
