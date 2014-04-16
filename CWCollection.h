@@ -75,7 +75,9 @@ typedef void (^CWCollectionPrepareResult)(id <CWCollectionModelProtocol> model, 
 
 - (void)addModel:(id <CWCollectionModelProtocol>)model;
 - (void)removeModel:(id <CWCollectionModelProtocol>)model;
+- (void)removeModelWithIdentifier:(NSString *)identifier;
 - (void)updateModel:(id <CWCollectionModelProtocol>)model;
+- (void)updateModel:(id <CWCollectionModelProtocol>)model silent:(BOOL)silent;
 
 - (void)sort;
 

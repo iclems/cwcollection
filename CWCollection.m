@@ -61,17 +61,26 @@
 
 - (void)removeModel:(id <CWCollectionModelProtocol>)model
 {
-    id <CWCollectionModelProtocol> localModel = [self objectForKey:model.identifier];
+    [self removeModelWithIdentifier:model.identifier];
+}
+
+- (void)removeModelWithIdentifier:(NSString *)identifier
+{
+    id <CWCollectionModelProtocol> localModel = [self objectForKey:identifier];
     if (localModel)
     {
         NSUInteger index = [self indexOf:localModel];
-        [self removeObjectForKey:localModel.identifier];
-        [self sort];
+        [self removeObjectForKey:identifier];
         [self modelRemoved:localModel atIndex:index];
     }
 }
 
 - (void)updateModel:(id <CWCollectionModelProtocol>)model
+{
+    return [self updateModel:model silent:NO];
+}
+
+- (void)updateModel:(id <CWCollectionModelProtocol>)model silent:(BOOL)silent
 {
     id localModel = [self objectForKey:model.identifier];
     if (localModel)
@@ -79,17 +88,20 @@
         NSUInteger indexBeforeUpdate = [self indexOf:localModel];
         
         [localModel updateWithDictionary:model.dictionary];
-        [self modelUpdated:localModel atIndex:indexBeforeUpdate];
-        [self sort];
         
-        NSUInteger indexAfterUpdate = [self indexOf:localModel];
-        BOOL modelDidMove = indexBeforeUpdate != indexAfterUpdate;
-        
-        if (modelDidMove)
+        if (!silent)
         {
-            [self modelMoved:localModel fromIndex:indexBeforeUpdate toIndex:indexAfterUpdate];
+            [self modelUpdated:localModel atIndex:indexBeforeUpdate];
+            [self sort];
+            
+            NSUInteger indexAfterUpdate = [self indexOf:localModel];
+            BOOL modelDidMove = indexBeforeUpdate != indexAfterUpdate;
+            
+            if (modelDidMove)
+            {
+                [self modelMoved:localModel fromIndex:indexBeforeUpdate toIndex:indexAfterUpdate];
+            }
         }
-        
     }
 }
 

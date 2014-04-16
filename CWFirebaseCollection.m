@@ -16,6 +16,7 @@
 @property (nonatomic, assign) BOOL isListeningForNew;
 @property (nonatomic, assign) BOOL isListeningForChange;
 @property (nonatomic, assign) BOOL isListeningForMove;
+@property (nonatomic, assign) BOOL isListeningForRemove;
 
 @property (nonatomic, strong) NSMutableArray *currentBatchModels;
 @property (nonatomic, strong) FDataSnapshot *lastDataSnapshot;
@@ -44,6 +45,7 @@
     [self startListeningForNew];
     [self startListeningForChange];
     [self startListeningForMove];
+    [self startListeningForRemove];
 }
 
 - (void)startListeningForNew
@@ -83,6 +85,18 @@
     
     [self.reference observeEventType:FEventTypeChildMoved withBlock:^(FDataSnapshot *snapshot) {
         [this remoteModelDidChangeWithSnapshot:snapshot];
+    }];
+}
+
+- (void)startListeningForRemove
+{
+    if (self.isListeningForRemove) return;
+    else self.isListeningForRemove = YES;
+    
+    __block CWFirebaseCollection *this = self;
+    
+    [self.reference observeEventType:FEventTypeChildRemoved withBlock:^(FDataSnapshot *snapshot) {
+        [this removeModelWithIdentifier:snapshot.name];
     }];
 }
 
@@ -129,17 +143,28 @@
     
     FQuery *query = limit ? [self.reference queryLimitedToNumberOfChildren:limit] : self.reference;
     
-    if (self.lastDataSnapshot) {
+    NSString *startDataSnapshotName = nil;
+    
+    if (self.lastDataSnapshot)
+    {
         query = [query queryEndingAtPriority:self.lastDataSnapshot.priority
                                 andChildName:self.lastDataSnapshot.name];
+        
+        startDataSnapshotName = self.lastDataSnapshot.name;
     }
     
     __block CWFirebaseCollection *this = self;
     
     [query observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
         
-        __block NSUInteger preparedCount = 0;
-        __block NSUInteger totalCount = snapshot.childrenCount;
+        __block NSUInteger totalCount = snapshot.childrenCount - (this.lastDataSnapshot ? 1 : 0);
+        __block NSMutableDictionary *preparedSnapshots = [NSMutableDictionary dictionary];
+        
+        /**
+         * completionBlock takes care of complex situations linked with offline cache, 
+         * where the completionBlock may be called several times for the same snapshot.
+         * If the model has already been created, it will update it silently.
+         */
         
         void (^completionBlock)(id <CWCollectionModelProtocol>, FDataSnapshot *snapshot) = ^(id <CWCollectionModelProtocol> model, FDataSnapshot *snapshot)
         {
@@ -148,15 +173,19 @@
                 [this.currentBatchModels addObject:model];
                 [this addModel:model];
             }
+            else if (model) {
+                [this updateModel:model silent:YES];
+            }
             
-            preparedCount++;
+            if (preparedSnapshots[snapshot.name]) return;
+            else [preparedSnapshots setObject:@(YES) forKey:snapshot.name];
             
-            if (preparedCount >= totalCount)
+            if (preparedSnapshots.count == totalCount)
             {
                 this.isLoading = NO;
                 
                 if (completion) {
-                    completion(this, this.currentBatchModels);
+                    completion(this, self.currentBatchModels);
                 }
 
                 [this startListeners];
@@ -172,14 +201,17 @@
         
         for (FDataSnapshot *childSnapshot in snapshot.children) {
             
-            if (enumIndex == lastDataIndex) {
-                this.lastDataSnapshot = childSnapshot;
-            }
-            
-            if ([childSnapshot.value isKindOfClass:NSNull.class]) {
-                completionBlock(nil, snapshot);
-            } else {
-                [this.dataSource collection:this prepareModelWithData:childSnapshot completion:completionBlock];
+            if (startDataSnapshotName != childSnapshot.name)
+            {
+                if (enumIndex == lastDataIndex) {
+                    this.lastDataSnapshot = childSnapshot;
+                }
+                
+                if ([childSnapshot.value isKindOfClass:NSNull.class]) {
+                    completionBlock(nil, snapshot);
+                } else {
+                    [this.dataSource collection:this prepareModelWithData:childSnapshot completion:completionBlock];
+                }
             }
             
             enumIndex++;
