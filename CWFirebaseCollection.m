@@ -40,6 +40,11 @@
     return self;
 }
 
+- (NSString *)description
+{
+    return _reference.description;
+}
+
 - (void)startListeners
 {
     [self startListeningForNew];
