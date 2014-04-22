@@ -53,6 +53,9 @@
     id localModel = [self objectForKey:model.identifier];
     if (!localModel)
     {
+        if ([model respondsToSelector:@selector(setCollection:)]) {
+            model.collection = self;
+        }
         [self setObject:model forKey:model.identifier];
         [self sort];
         [self modelAdded:model atIndex:[self indexOf:model]];

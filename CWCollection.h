@@ -23,7 +23,7 @@
 
 @optional
 
-- (CWCollection *)collection;
+@property (nonatomic, weak) CWCollection *collection;
 
 @end
 
