@@ -61,9 +61,13 @@
         if ([model respondsToSelector:@selector(setCollection:)]) {
             model.collection = self;
         }
+        
         [self setObject:model forKey:model.identifier];
         [self sort];
-        [self modelAdded:model atIndex:[self indexOf:model]];
+        
+        if (!silent) {
+            [self modelAdded:model atIndex:[self indexOf:model]];
+        }
     }
 }
 
@@ -88,8 +92,12 @@
     if (localModel)
     {
         NSUInteger index = [self indexOf:localModel];
+        
         [self removeObjectForKey:identifier];
-        [self modelRemoved:localModel atIndex:index];
+        
+        if (!silent) {
+            [self modelRemoved:localModel atIndex:index];
+        }
     }
 }
 
