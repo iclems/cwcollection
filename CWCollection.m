@@ -50,6 +50,11 @@
 
 - (void)addModel:(id <CWCollectionModelProtocol>)model
 {
+    return [self addModel:model silent:NO];
+}
+
+- (void)addModel:(id <CWCollectionModelProtocol>)model silent:(BOOL)silent
+{
     id localModel = [self objectForKey:model.identifier];
     if (!localModel)
     {
@@ -64,10 +69,20 @@
 
 - (void)removeModel:(id <CWCollectionModelProtocol>)model
 {
-    [self removeModelWithIdentifier:model.identifier];
+    [self removeModel:model silent:NO];
+}
+
+- (void)removeModel:(id <CWCollectionModelProtocol>)model silent:(BOOL)silent
+{
+    return [self removeModelWithIdentifier:model.identifier silent:silent];
 }
 
 - (void)removeModelWithIdentifier:(NSString *)identifier
+{
+    return [self removeModelWithIdentifier:identifier silent:NO];
+}
+
+- (void)removeModelWithIdentifier:(NSString *)identifier silent:(BOOL)silent
 {
     id <CWCollectionModelProtocol> localModel = [self objectForKey:identifier];
     if (localModel)
