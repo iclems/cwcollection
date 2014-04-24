@@ -10,4 +10,7 @@
 
 @interface CWViewController : UIViewController
 
+@property (nonatomic, strong) IBOutlet UITableView *tableView;
+@property (nonatomic, strong) IBOutlet UIActivityIndicatorView *loadingIndicator;
+
 @end

@@ -23,6 +23,8 @@
 		191DAD2019094D0000CD016F /* DemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 191DAD1F19094D0000CD016F /* DemoTests.m */; };
 		191DAD3319094D8800CD016F /* CWCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 191DAD3019094D8800CD016F /* CWCollection.m */; };
 		191DAD3419094D8800CD016F /* CWFirebaseCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 191DAD3219094D8800CD016F /* CWFirebaseCollection.m */; };
+		191DAD3719094E6500CD016F /* CWDemoCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 191DAD3619094E6500CD016F /* CWDemoCollection.m */; };
+		191DAD3A19094EE800CD016F /* CWDemoModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 191DAD3919094EE800CD016F /* CWDemoModel.m */; };
 		B1C42D7D230647FD83FB81D6 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1ED5A4644BDC4525B7997784 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -60,6 +62,10 @@
 		191DAD3019094D8800CD016F /* CWCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CWCollection.m; path = ../../CWCollection.m; sourceTree = "<group>"; };
 		191DAD3119094D8800CD016F /* CWFirebaseCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CWFirebaseCollection.h; path = ../../CWFirebaseCollection.h; sourceTree = "<group>"; };
 		191DAD3219094D8800CD016F /* CWFirebaseCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CWFirebaseCollection.m; path = ../../CWFirebaseCollection.m; sourceTree = "<group>"; };
+		191DAD3519094E6500CD016F /* CWDemoCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWDemoCollection.h; sourceTree = "<group>"; };
+		191DAD3619094E6500CD016F /* CWDemoCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CWDemoCollection.m; sourceTree = "<group>"; };
+		191DAD3819094EE800CD016F /* CWDemoModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWDemoModel.h; sourceTree = "<group>"; };
+		191DAD3919094EE800CD016F /* CWDemoModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CWDemoModel.m; sourceTree = "<group>"; };
 		1ED5A4644BDC4525B7997784 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CEB270A9F4E48E28978A844 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -127,12 +133,13 @@
 				191DAD0319094D0000CD016F /* CWAppDelegate.h */,
 				191DAD0419094D0000CD016F /* CWAppDelegate.m */,
 				191DAD0619094D0000CD016F /* Main.storyboard */,
-				191DAD2F19094D8800CD016F /* CWCollection.h */,
-				191DAD3019094D8800CD016F /* CWCollection.m */,
-				191DAD3119094D8800CD016F /* CWFirebaseCollection.h */,
-				191DAD3219094D8800CD016F /* CWFirebaseCollection.m */,
 				191DAD0919094D0000CD016F /* CWViewController.h */,
 				191DAD0A19094D0000CD016F /* CWViewController.m */,
+				191DAD3519094E6500CD016F /* CWDemoCollection.h */,
+				191DAD3619094E6500CD016F /* CWDemoCollection.m */,
+				191DAD3819094EE800CD016F /* CWDemoModel.h */,
+				191DAD3919094EE800CD016F /* CWDemoModel.m */,
+				191DAD3B1909561100CD016F /* CWCollection */,
 				191DAD0C19094D0000CD016F /* Images.xcassets */,
 				191DACFB19094D0000CD016F /* Supporting Files */,
 			);
@@ -166,6 +173,17 @@
 				191DAD1C19094D0000CD016F /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		191DAD3B1909561100CD016F /* CWCollection */ = {
+			isa = PBXGroup;
+			children = (
+				191DAD2F19094D8800CD016F /* CWCollection.h */,
+				191DAD3019094D8800CD016F /* CWCollection.m */,
+				191DAD3119094D8800CD016F /* CWFirebaseCollection.h */,
+				191DAD3219094D8800CD016F /* CWFirebaseCollection.m */,
+			);
+			name = CWCollection;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -305,6 +323,8 @@
 				191DAD0119094D0000CD016F /* main.m in Sources */,
 				191DAD0B19094D0000CD016F /* CWViewController.m in Sources */,
 				191DAD3419094D8800CD016F /* CWFirebaseCollection.m in Sources */,
+				191DAD3719094E6500CD016F /* CWDemoCollection.m in Sources */,
+				191DAD3A19094EE800CD016F /* CWDemoModel.m in Sources */,
 				191DAD3319094D8800CD016F /* CWCollection.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
