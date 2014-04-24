@@ -70,7 +70,7 @@
         query = [self.reference queryStartingAtPriority:self.lastDataSnapshot.priority andChildName:self.lastDataSnapshot.name];
     }
     
-    __block CWFirebaseCollection *this = self;
+    __weak CWFirebaseCollection *this = self;
    
     [query observeEventType:FEventTypeChildAdded withBlock:^(FDataSnapshot *snapshot) {
         [this.dataSource collection:this prepareModelWithData:snapshot completion:^(id <CWCollectionModelProtocol> model, FDataSnapshot *snapshot) {
@@ -86,7 +86,7 @@
     if (self.isListeningForMove) return;
     else self.isListeningForMove = YES;
     
-    __block CWFirebaseCollection *this = self;
+    __weak CWFirebaseCollection *this = self;
     
     [self.reference observeEventType:FEventTypeChildMoved withBlock:^(FDataSnapshot *snapshot) {
         [this remoteModelDidChangeWithSnapshot:snapshot];
@@ -98,7 +98,7 @@
     if (self.isListeningForRemove) return;
     else self.isListeningForRemove = YES;
     
-    __block CWFirebaseCollection *this = self;
+    __weak CWFirebaseCollection *this = self;
     
     [self.reference observeEventType:FEventTypeChildRemoved withBlock:^(FDataSnapshot *snapshot) {
         [this removeModelWithIdentifier:snapshot.name];
@@ -110,7 +110,7 @@
     if (self.isListeningForChange) return;
     else self.isListeningForChange = YES;
     
-    __block CWFirebaseCollection *this = self;
+    __weak CWFirebaseCollection *this = self;
     
     [self.reference observeEventType:FEventTypeChildChanged withBlock:^(FDataSnapshot *snapshot) {
         [this remoteModelDidChangeWithSnapshot:snapshot];
@@ -119,7 +119,7 @@
 
 - (void)remoteModelDidChangeWithSnapshot:(FDataSnapshot *)snapshot
 {
-    __block CWFirebaseCollection *this = self;
+    __weak CWFirebaseCollection *this = self;
     
     [self.dataSource collection:self prepareModelWithData:snapshot completion:^(id <CWCollectionModelProtocol> model, FDataSnapshot *snapshot) {
         if (model) {
@@ -158,7 +158,7 @@
         startDataSnapshotName = self.lastDataSnapshot.name;
     }
     
-    __block CWFirebaseCollection *this = self;
+    __weak CWFirebaseCollection *this = self;
     
     [query observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
         
