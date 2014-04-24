@@ -8,7 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface CWViewController : UIViewController
+#import "CWDemoCollection.h"
+
+@interface CWViewController : UIViewController <CWFirebaseCollectionDelegate>
 
 @property (nonatomic, strong) IBOutlet UITableView *tableView;
 @property (nonatomic, strong) IBOutlet UIActivityIndicatorView *loadingIndicator;

@@ -7,7 +7,6 @@
 //
 
 #import "CWViewController.h"
-#import "CWDemoCollection.h"
 #import "CWDemoModel.h"
 
 @interface CWViewController ()
@@ -23,6 +22,7 @@
     [super viewDidLoad];
 
     _collection = [[CWDemoCollection alloc] init];
+    _collection.delegate = self;
     
     [self loadMore];
 }
@@ -38,6 +38,7 @@
     [_loadingIndicator stopAnimating];
 
     NSIndexPath *indexPath = [self.tableView indexPathsForVisibleRows].lastObject;
+    
     if (!self.collection.isLoading && indexPath.row > self.collection.count - 5)
     {
         [self loadMore];
@@ -46,15 +47,14 @@
 
 - (void)loadMore
 {
-    [_loadingIndicator startAnimating];
-    
     __weak CWViewController *this = self;
     
     [self.collection loadMoreWithCompletion:^(CWCollection *collection, NSArray *models) {
-        [_loadingIndicator stopAnimating];
         [_tableView insertRowsAtIndexPaths:[this indexPathsWithModels:models] withRowAnimation:UITableViewRowAnimationAutomatic];
     }];
 }
+
+#pragma mark - CWCollection Delegate
 
 - (void)collection:(CWCollection *)collection modelAdded:(id<CWCollectionModelProtocol>)model atIndex:(NSUInteger)index inBatch:(BOOL)inBatch
 {
@@ -79,6 +79,17 @@
 - (void)collection:(CWCollection *)collection modelMoved:(id<CWCollectionModelProtocol>)model fromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex
 {
     [self.tableView moveRowAtIndexPath:[self indexPathFromIndex:fromIndex] toIndexPath:[self indexPathFromIndex:toIndex]];
+}
+
+- (void)collectionDidStartLoad:(CWCollection *)collection
+{
+    [_loadingIndicator startAnimating];
+}
+
+- (void)collectionDidEndLoad:(CWCollection *)collection
+{
+    [_loadingIndicator stopAnimating];
+    // e.g. check if empty, show placeholder
 }
 
 #pragma mark - Table View Delegate
