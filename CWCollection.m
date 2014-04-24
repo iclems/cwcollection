@@ -40,7 +40,7 @@
 {
     if (self.dataSource && [self.dataSource respondsToSelector:@selector(collection:sortCompareModel:withModel:)])
     {
-        __block CWCollection *this = self;
+        __weak CWCollection *this = self;
         
         [_models sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
             return [this.dataSource collection:this sortCompareModel:obj1 withModel:obj2];
