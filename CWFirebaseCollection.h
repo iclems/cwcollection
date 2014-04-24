@@ -9,11 +9,22 @@
 
 #import "CWCollection.h"
 
+@protocol CWFirebaseCollectionModelProtocol <CWCollectionModelProtocol>
+
+@optional
+
+- (Firebase *)reference;
+- (void)remove;
+
+@end
+
 @protocol CWFirebaseCollectionDelegate <CWCollectionDelegate>
 
 @optional
 
 - (void)collection:(CWCollection *)collection modelAdded:(id<CWCollectionModelProtocol>)model atIndex:(NSUInteger)index inBatch:(BOOL)inBatch;
+
+@property (nonatomic, strong, readonly) Firebase* reference;
 
 @end
 
@@ -42,5 +53,6 @@
 - (void)startListeningForNew;
 - (void)startListeningForChange;
 - (void)startListeningForMove;
+- (void)startListeningForRemove;
 
 @end

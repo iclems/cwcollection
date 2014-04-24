@@ -23,7 +23,7 @@
 
 @optional
 
-- (CWCollection *)collection;
+@property (nonatomic, weak) CWCollection *collection;
 
 @end
 
@@ -74,8 +74,11 @@ typedef void (^CWCollectionPrepareResult)(id <CWCollectionModelProtocol> model, 
 @property (nonatomic, weak) id <CWCollectionDataSource> dataSource;
 
 - (void)addModel:(id <CWCollectionModelProtocol>)model;
+- (void)addModel:(id <CWCollectionModelProtocol>)model silent:(BOOL)silent;
 - (void)removeModel:(id <CWCollectionModelProtocol>)model;
+- (void)removeModel:(id <CWCollectionModelProtocol>)model silent:(BOOL)silent;
 - (void)updateModel:(id <CWCollectionModelProtocol>)model;
+- (void)updateModel:(id <CWCollectionModelProtocol>)model silent:(BOOL)silent;
 
 - (void)sort;
 
@@ -87,6 +90,9 @@ typedef void (^CWCollectionPrepareResult)(id <CWCollectionModelProtocol> model, 
 - (void)removeDelegate:(id <CWCollectionDelegate>)delegate;
 
 // Internal methods
+
+- (void)removeModelWithIdentifier:(NSString *)identifier;
+- (void)removeModelWithIdentifier:(NSString *)identifier silent:(BOOL)silent;
 
 - (void)modelAdded:(id <CWCollectionModelProtocol>)model atIndex:(NSUInteger)index;
 - (void)modelRemoved:(id <CWCollectionModelProtocol>)model atIndex:(NSUInteger)index;

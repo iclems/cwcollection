@@ -40,7 +40,7 @@
 {
     if (self.dataSource && [self.dataSource respondsToSelector:@selector(collection:sortCompareModel:withModel:)])
     {
-        __block CWCollection *this = self;
+        __weak CWCollection *this = self;
         
         [_models sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
             return [this.dataSource collection:this sortCompareModel:obj1 withModel:obj2];
@@ -50,28 +50,63 @@
 
 - (void)addModel:(id <CWCollectionModelProtocol>)model
 {
+    return [self addModel:model silent:NO];
+}
+
+- (void)addModel:(id <CWCollectionModelProtocol>)model silent:(BOOL)silent
+{
     id localModel = [self objectForKey:model.identifier];
     if (!localModel)
     {
+        if ([model respondsToSelector:@selector(setCollection:)]) {
+            model.collection = self;
+        }
+        
         [self setObject:model forKey:model.identifier];
         [self sort];
-        [self modelAdded:model atIndex:[self indexOf:model]];
+        
+        if (!silent) {
+            [self modelAdded:model atIndex:[self indexOf:model]];
+        }
     }
 }
 
 - (void)removeModel:(id <CWCollectionModelProtocol>)model
 {
-    id <CWCollectionModelProtocol> localModel = [self objectForKey:model.identifier];
+    [self removeModel:model silent:NO];
+}
+
+- (void)removeModel:(id <CWCollectionModelProtocol>)model silent:(BOOL)silent
+{
+    return [self removeModelWithIdentifier:model.identifier silent:silent];
+}
+
+- (void)removeModelWithIdentifier:(NSString *)identifier
+{
+    return [self removeModelWithIdentifier:identifier silent:NO];
+}
+
+- (void)removeModelWithIdentifier:(NSString *)identifier silent:(BOOL)silent
+{
+    id <CWCollectionModelProtocol> localModel = [self objectForKey:identifier];
     if (localModel)
     {
         NSUInteger index = [self indexOf:localModel];
-        [self removeObjectForKey:localModel.identifier];
-        [self sort];
-        [self modelRemoved:localModel atIndex:index];
+        
+        [self removeObjectForKey:identifier];
+        
+        if (!silent) {
+            [self modelRemoved:localModel atIndex:index];
+        }
     }
 }
 
 - (void)updateModel:(id <CWCollectionModelProtocol>)model
+{
+    return [self updateModel:model silent:NO];
+}
+
+- (void)updateModel:(id <CWCollectionModelProtocol>)model silent:(BOOL)silent
 {
     id localModel = [self objectForKey:model.identifier];
     if (localModel)
@@ -79,17 +114,20 @@
         NSUInteger indexBeforeUpdate = [self indexOf:localModel];
         
         [localModel updateWithDictionary:model.dictionary];
-        [self modelUpdated:localModel atIndex:indexBeforeUpdate];
-        [self sort];
         
-        NSUInteger indexAfterUpdate = [self indexOf:localModel];
-        BOOL modelDidMove = indexBeforeUpdate != indexAfterUpdate;
-        
-        if (modelDidMove)
+        if (!silent)
         {
-            [self modelMoved:localModel fromIndex:indexBeforeUpdate toIndex:indexAfterUpdate];
+            [self modelUpdated:localModel atIndex:indexBeforeUpdate];
+            [self sort];
+            
+            NSUInteger indexAfterUpdate = [self indexOf:localModel];
+            BOOL modelDidMove = indexBeforeUpdate != indexAfterUpdate;
+            
+            if (modelDidMove)
+            {
+                [self modelMoved:localModel fromIndex:indexBeforeUpdate toIndex:indexAfterUpdate];
+            }
         }
-        
     }
 }
 
