@@ -6,7 +6,6 @@
 //
 
 #import <objc/runtime.h>
-#import <Firebase/Firebase.h>
 
 #import "CWFirebaseCollection.h"
 
