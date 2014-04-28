@@ -162,6 +162,7 @@
     
     [query observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
         
+        __block BOOL batchLoading = YES;
         __block NSUInteger totalCount = snapshot.childrenCount - (this.lastDataSnapshot ? 1 : 0);
         __block NSMutableDictionary *preparedSnapshots = [NSMutableDictionary dictionary];
         
@@ -173,6 +174,8 @@
         
         void (^completionBlock)(id <CWCollectionModelProtocol>, FDataSnapshot *snapshot) = ^(id <CWCollectionModelProtocol> model, FDataSnapshot *snapshot)
         {
+            if (!batchLoading) return;
+            
             if (model && ![self hasModel:model])
             {
                 [this.currentBatchModels addObject:model];
@@ -190,7 +193,7 @@
             
             if (preparedSnapshots.count == totalCount)
             {
-                this.isLoading = NO;
+                this.isLoading = batchLoading = NO;
                 
                 if (completion) {
                     completion(this, self.currentBatchModels);
