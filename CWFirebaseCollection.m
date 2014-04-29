@@ -176,7 +176,7 @@
         
         void (^completionBlock)(id <CWCollectionModelProtocol>, FDataSnapshot *snapshot) = ^(id <CWCollectionModelProtocol> model, FDataSnapshot *snapshot)
         {
-            if (batchLoading) {
+            if (!batchLoading) {
                 
                 // Query already completed, but receives new data updates.
                 // This is due to Firebase Offline cache which forces us to accept
