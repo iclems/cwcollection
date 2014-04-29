@@ -67,11 +67,12 @@ typedef void (^CWCollectionPrepareResult)(id <CWCollectionModelProtocol> model, 
  * CWCollection
  */
 
-@interface CWCollection : NSMutableDictionary
+@interface CWCollection : NSObject
 
 @property (nonatomic, strong, readonly) NSMutableArray *models;
-@property (nonatomic, strong, readonly) NSMutableArray *delegates;
-@property (nonatomic, weak) id <CWCollectionDataSource> dataSource;
+
+@property (nonatomic, assign) id <CWCollectionDelegate> delegate;
+@property (nonatomic, assign) id <CWCollectionDataSource> dataSource;
 
 - (void)addModel:(id <CWCollectionModelProtocol>)model;
 - (void)addModel:(id <CWCollectionModelProtocol>)model silent:(BOOL)silent;
@@ -81,13 +82,10 @@ typedef void (^CWCollectionPrepareResult)(id <CWCollectionModelProtocol> model, 
 - (void)updateModel:(id <CWCollectionModelProtocol>)model silent:(BOOL)silent;
 
 - (void)sort;
+- (NSUInteger)count;
 
 - (NSUInteger)indexOf:(id <CWCollectionModelProtocol>)model;
 - (BOOL)hasModel:(id <CWCollectionModelProtocol>)model;
-
-- (void)setDelegate:(id <CWCollectionDelegate>)delegate; // performs addDelegate
-- (void)addDelegate:(id <CWCollectionDelegate>)delegate;
-- (void)removeDelegate:(id <CWCollectionDelegate>)delegate;
 
 // Internal methods
 

@@ -40,19 +40,16 @@
 @interface CWFirebaseCollection : CWCollection
 
 @property (nonatomic, strong, readonly) Firebase* reference;
+@property (nonatomic, assign, readonly) BOOL isLoading;
+
+@property (nonatomic, assign) id <CWFirebaseCollectionDelegate> delegate;
+
 @property (nonatomic, assign) NSUInteger batchSize;
 @property (nonatomic, assign) BOOL isAscending;
-@property (nonatomic, assign, readonly) BOOL isLoading;
 @property (nonatomic, assign) BOOL autoStartListeners;
 
 - (id)initWithReference:(Firebase *)reference dataSource:(id <CWFirebaseCollectionDataSource>)dataSource;
 - (void)loadAllWithCompletion:(void (^)(CWCollection *collection, NSArray *models))completion;
 - (void)loadMoreWithCompletion:(void (^)(CWCollection *collection, NSArray *models))completion;
-
-- (void)startListeners;
-- (void)startListeningForNew;
-- (void)startListeningForChange;
-- (void)startListeningForMove;
-- (void)startListeningForRemove;
 
 @end

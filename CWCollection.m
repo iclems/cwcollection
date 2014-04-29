@@ -10,7 +10,6 @@
 @interface CWCollection()
 
 @property (nonatomic, strong, readwrite) NSMutableArray *models;
-@property (nonatomic, strong, readwrite) NSMutableArray *delegates;
 
 @property (nonatomic, strong) NSMutableDictionary *dictionary;
 @property (nonatomic, strong) NSComparator comparator;
@@ -29,7 +28,6 @@
     if (self = [super init]) {
         _dictionary = [[NSMutableDictionary alloc] initWithCapacity:capacity];
         _models = [[NSMutableArray alloc] initWithCapacity:capacity];
-        _delegates = [NSMutableArray array];
     }
     return self;
 }
@@ -135,62 +133,33 @@
 
 - (void)modelAdded:(id <CWCollectionModelProtocol>)model atIndex:(NSUInteger)index
 {
-    for (id <CWCollectionDelegate> delegate in self.delegates) {
-        if ([delegate respondsToSelector:@selector(collection:modelAdded:atIndex:)]) {
-            [delegate collection:self modelAdded:model atIndex:index];
-        }
+    if ([_delegate respondsToSelector:@selector(collection:modelAdded:atIndex:)]) {
+        [_delegate collection:self modelAdded:model atIndex:index];
     }
 }
 
 - (void)modelRemoved:(id <CWCollectionModelProtocol>)model atIndex:(NSUInteger)index
 {
-    for (id <CWCollectionDelegate> delegate in self.delegates) {
-        if ([delegate respondsToSelector:@selector(collection:modelRemoved:atIndex:)]) {
-            [delegate collection:self modelRemoved:model atIndex:index];
-        }
+    if ([_delegate respondsToSelector:@selector(collection:modelRemoved:atIndex:)]) {
+        [_delegate collection:self modelRemoved:model atIndex:index];
     }
 }
 
 - (void)modelUpdated:(id <CWCollectionModelProtocol>)model atIndex:(NSUInteger)index
 {
-    for (id <CWCollectionDelegate> delegate in self.delegates) {
-        if ([delegate respondsToSelector:@selector(collection:modelUpdated:atIndex:)]) {
-            [delegate collection:self modelUpdated:model atIndex:index];
-        }
+    if ([_delegate respondsToSelector:@selector(collection:modelUpdated:atIndex:)]) {
+        [_delegate collection:self modelUpdated:model atIndex:index];
     }
 }
 
 - (void)modelMoved:(id <CWCollectionModelProtocol>)model fromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex
 {
-    for (id <CWCollectionDelegate> delegate in self.delegates) {
-        if ([delegate respondsToSelector:@selector(collection:modelMoved:fromIndex:toIndex:)]) {
-            [delegate collection:self modelMoved:model fromIndex:fromIndex toIndex:toIndex];
-        }
+    if ([_delegate respondsToSelector:@selector(collection:modelMoved:fromIndex:toIndex:)]) {
+        [_delegate collection:self modelMoved:model fromIndex:fromIndex toIndex:toIndex];
     }
 }
 
-#pragma mark - Delegate Manager
-
-- (void)setDelegate:(id <CWCollectionDelegate>)delegate
-{
-    [self addDelegate:delegate];
-}
-
-- (void)addDelegate:(id <CWCollectionDelegate>)delegate
-{
-    [_delegates addObject:delegate];
-}
-
-- (void)removeDelegate:(id <CWCollectionDelegate>)delegate
-{
-    [_delegates removeObject:delegate];
-}
-
 #pragma mark - NSMutableDictionary
-
-/**
- * NSMutableDictionary subclass requirements
- */
 
 - (void)setObject:(id)anObject forKey:(id)aKey
 {
@@ -209,7 +178,7 @@
 
 - (NSUInteger)count
 {
-    return [_dictionary count];
+    return [_models count];
 }
 
 - (id)objectForKey:(id)aKey

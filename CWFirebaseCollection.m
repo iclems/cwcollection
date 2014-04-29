@@ -14,11 +14,7 @@
 @property (nonatomic, strong, readwrite) Firebase* reference;
 @property (nonatomic, assign, readwrite) BOOL isLoading;
 
-@property (nonatomic, assign) BOOL isListeningForNew;
-@property (nonatomic, assign) BOOL isListeningForChange;
-@property (nonatomic, assign) BOOL isListeningForMove;
-@property (nonatomic, assign) BOOL isListeningForRemove;
-
+@property (nonatomic, strong) NSMutableDictionary *eventHandles;
 @property (nonatomic, strong) NSMutableArray *currentBatchModels;
 @property (nonatomic, strong) FDataSnapshot *lastDataSnapshot;
 
@@ -49,15 +45,14 @@
 - (void)startListeners
 {
     [self startListeningForNew];
-    [self startListeningForChange];
-    [self startListeningForMove];
-    [self startListeningForRemove];
+    [self setupListenerForEventType:FEventTypeChildChanged withSelector:@selector(remoteModelDidChangeWithSnapshot:)];
+    [self setupListenerForEventType:FEventTypeChildMoved withSelector:@selector(remoteModelDidChangeWithSnapshot:)];
+    [self setupListenerForEventType:FEventTypeChildRemoved withSelector:@selector(removeModelWithSnapshot:)];
 }
 
 - (void)startListeningForNew
 {
-    if (self.isListeningForNew) return;
-    else self.isListeningForNew = YES;
+    if (_eventHandles[@(FEventTypeChildAdded)]) return;
     
     FQuery *query = nil;
     
@@ -72,50 +67,39 @@
     }
     
     __weak CWFirebaseCollection *this = self;
-   
-    [query observeEventType:FEventTypeChildAdded withBlock:^(FDataSnapshot *snapshot) {
+    FirebaseHandle handle;
+    handle = [query observeEventType:FEventTypeChildAdded withBlock:^(FDataSnapshot *snapshot) {
         [this.dataSource collection:this prepareModelWithData:snapshot completion:^(id <CWCollectionModelProtocol> model, FDataSnapshot *snapshot) {
             if (model) {
                 [this addModel:model];
             }
         }];
     }];
+    
+    _eventHandles[@(FEventTypeChildAdded)] = @(handle);
 }
 
-- (void)startListeningForMove
+- (void)setupListenerForEventType:(FEventType)eventType withSelector:(SEL)selector
 {
-    if (self.isListeningForMove) return;
-    else self.isListeningForMove = YES;
-    
+    if (_eventHandles[@(eventType)]) return;
+
     __weak CWFirebaseCollection *this = self;
+    FirebaseHandle handle;
     
-    [self.reference observeEventType:FEventTypeChildMoved withBlock:^(FDataSnapshot *snapshot) {
-        [this remoteModelDidChangeWithSnapshot:snapshot];
+    handle = [self.reference observeEventType:eventType withBlock:^(FDataSnapshot *snapshot) {
+        if ([this respondsToSelector:selector]) {
+            IMP imp = class_getMethodImplementation(this.class, selector);
+            void (*func)(id, SEL, FDataSnapshot *) = (void *)imp;
+            func(this, selector, snapshot);
+        }
     }];
+    
+    _eventHandles[@(eventType)] = @(handle);
 }
 
-- (void)startListeningForRemove
+- (void)removeModelWithSnapshot:(FDataSnapshot *)snapshot
 {
-    if (self.isListeningForRemove) return;
-    else self.isListeningForRemove = YES;
-    
-    __weak CWFirebaseCollection *this = self;
-    
-    [self.reference observeEventType:FEventTypeChildRemoved withBlock:^(FDataSnapshot *snapshot) {
-        [this removeModelWithIdentifier:snapshot.name];
-    }];
-}
-
-- (void)startListeningForChange
-{
-    if (self.isListeningForChange) return;
-    else self.isListeningForChange = YES;
-    
-    __weak CWFirebaseCollection *this = self;
-    
-    [self.reference observeEventType:FEventTypeChildChanged withBlock:^(FDataSnapshot *snapshot) {
-        [this remoteModelDidChangeWithSnapshot:snapshot];
-    }];
+    [self removeModelWithIdentifier:snapshot.name];
 }
 
 - (void)remoteModelDidChangeWithSnapshot:(FDataSnapshot *)snapshot
@@ -142,7 +126,7 @@
 
 - (void)runQueryWithLimit:(NSUInteger)limit completion:(void (^)(CWCollection *collection, NSArray *models))completion
 {
-    if (self.isLoading) return;
+    if (self.isLoading) return completion(self, @[]);
     else self.isLoading = YES;
     
     [self.currentBatchModels  removeAllObjects];
@@ -160,12 +144,29 @@
     }
     
     __weak CWFirebaseCollection *this = self;
+    __block BOOL batchLoading = YES;
     
     [query observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
         
-        __block BOOL batchLoading = YES;
         __block NSUInteger totalCount = snapshot.childrenCount - (this.lastDataSnapshot ? 1 : 0);
         __block NSMutableDictionary *preparedSnapshots = [NSMutableDictionary dictionary];
+        
+        void (^readyBlock)() = ^() {
+            
+            this.isLoading = batchLoading = NO;
+            
+            if (completion) {
+                completion(this, this.currentBatchModels);
+            }
+            
+            [this startListeners];
+            
+            preparedSnapshots = nil;
+        };
+        
+        if (!totalCount) {
+            return readyBlock();
+        }
         
         /**
          * completionBlock takes care of complex situations linked with offline cache, 
@@ -175,9 +176,21 @@
         
         void (^completionBlock)(id <CWCollectionModelProtocol>, FDataSnapshot *snapshot) = ^(id <CWCollectionModelProtocol> model, FDataSnapshot *snapshot)
         {
-            if (!batchLoading) return;
+            if (batchLoading) {
+                
+                // Query already completed, but receives new data updates.
+                // This is due to Firebase Offline cache which forces us to accept
+                // multiple completion callbacks per location (1. cache, 2. remote value).
+                // Yet, once we have received 1 callback per location, the query is
+                // considered completed (otherwise, it may never complete: e.g. if one child
+                // was indeed removed, it won't be called twice with NSNull)
+                
+                if (model && [this hasModel:model]) {
+                    return [this updateModel:model silent:NO];
+                }
+            }
             
-            if (model && ![self hasModel:model])
+            if (model && ![this hasModel:model])
             {
                 [this.currentBatchModels addObject:model];
                 [this addModel:model];
@@ -194,16 +207,14 @@
             
             if (preparedSnapshots.count == totalCount)
             {
-                this.isLoading = batchLoading = NO;
-                
-                if (completion) {
-                    completion(this, self.currentBatchModels);
-                }
-
-                [this startListeners];
+                readyBlock();
             }
         };
         
+        if (!snapshot.childrenCount) {
+            return completionBlock(nil, nil);
+        }
+
         NSUInteger enumIndex = 0;
         NSUInteger lastDataIndex = this.isAscending ? (snapshot.childrenCount - 1) : 0;
         
@@ -227,11 +238,7 @@
             }
             
             enumIndex++;
-        }
-        
-        if (!snapshot.childrenCount) {
-            completionBlock(nil, nil);
-        }
+        }        
     }];
 }
 
@@ -241,10 +248,8 @@
     
     BOOL inBatch = [self.currentBatchModels indexOfObject:model] != NSNotFound;
     
-    for (id <CWFirebaseCollectionDelegate> delegate in self.delegates) {
-        if ([delegate respondsToSelector:@selector(collection:modelAdded:atIndex:inBatch:)]) {
-            [delegate collection:self modelAdded:model atIndex:index inBatch:inBatch];
-        }
+    if ([self.delegate respondsToSelector:@selector(collection:modelAdded:atIndex:inBatch:)]) {
+        [self.delegate collection:self modelAdded:model atIndex:index inBatch:inBatch];
     }
 }
 
@@ -254,12 +259,10 @@
     
 	SEL selector = isLoading ? @selector(collectionDidStartLoad:) : @selector(collectionDidEndLoad:);
 
-    for (id <CWFirebaseCollectionDelegate> delegate in self.delegates) {
-        if ([delegate respondsToSelector:selector]) {
-            IMP imp = class_getMethodImplementation(delegate.class, selector);
-            void (*func)(id, SEL, CWCollection *) = (void *)imp;
-            func(delegate, selector, self);
-        }
+    if ([self.delegate respondsToSelector:selector]) {
+        IMP imp = class_getMethodImplementation(self.delegate.class, selector);
+        void (*func)(id, SEL, CWCollection *) = (void *)imp;
+        func(self.delegate, selector, self);
     }
 }
 
