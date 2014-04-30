@@ -111,9 +111,9 @@
     {
         NSUInteger indexBeforeUpdate = [self indexOf:localModel];
         
-        [localModel updateWithDictionary:model.dictionary];
+        BOOL didChange = [localModel updateWithDictionary:model.dictionary];
         
-        if (!silent)
+        if (!silent && didChange)
         {
             [self modelUpdated:localModel atIndex:indexBeforeUpdate];
             [self sort];

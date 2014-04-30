@@ -16,7 +16,7 @@
 
 @property (nonatomic, strong) NSMutableDictionary *eventHandles;
 @property (nonatomic, strong) NSMutableArray *currentBatchModels;
-@property (nonatomic, strong) FDataSnapshot *lastDataSnapshot;
+@property (nonatomic, strong, readwrite) FDataSnapshot *lastDataSnapshot;
 
 @end
 
@@ -68,11 +68,27 @@
     
     __weak CWFirebaseCollection *this = self;
     FirebaseHandle handle;
+    
     handle = [query observeEventType:FEventTypeChildAdded withBlock:^(FDataSnapshot *snapshot) {
+
+        __block BOOL processed = NO;
+
         [this.dataSource collection:this prepareModelWithData:snapshot completion:^(id <CWCollectionModelProtocol> model, FDataSnapshot *snapshot) {
-            if (model) {
+            
+            if (!model) return;
+            else if ([this hasModel:model])
+            {
+                [this updateModel:model silent:NO];
+            }
+            else if (!processed)
+            {
+                // If a model has already been processed, it should never be added again
+                // Otherwise, a model could have been removed in the meantime, but receive
+                // echo from prepareModelWithData:completion: as it may be still listening to somethig else
+                // TODO: it would be nice to receive a cancellable FOperation: we could cancel it from here
                 [this addModel:model];
             }
+            processed = YES;
         }];
     }];
     
@@ -185,9 +201,7 @@
                 // considered completed (otherwise, it may never complete: e.g. if one child
                 // was indeed removed, it won't be called twice with NSNull)
                 
-                if (model && [this hasModel:model]) {
-                    return [this updateModel:model silent:NO];
-                }
+                return model ? [this updateModel:model silent:NO] : nil;
             }
             
             if (model && ![this hasModel:model])

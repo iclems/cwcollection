@@ -19,7 +19,7 @@
 
 - (NSString *)identifier;
 - (NSDictionary *)dictionary;
-- (void)updateWithDictionary:(NSDictionary *)dictionary;
+- (BOOL)updateWithDictionary:(NSDictionary *)dictionary;
 
 @optional
 
