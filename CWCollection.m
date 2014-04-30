@@ -20,16 +20,12 @@
 
 - (id)init
 {
-	return [self initWithCapacity:0];
-}
-
-- (id)initWithCapacity:(NSUInteger)capacity
-{
     if (self = [super init]) {
-        _dictionary = [[NSMutableDictionary alloc] initWithCapacity:capacity];
-        _models = [[NSMutableArray alloc] initWithCapacity:capacity];
+        _dictionary = [NSMutableDictionary dictionary];
+        _models = [NSMutableArray array];
+        _sortUpdate = YES;
     }
-    return self;
+	return self;
 }
 
 #pragma mark - Models Management
@@ -116,14 +112,19 @@
         if (!silent && didChange)
         {
             [self modelUpdated:localModel atIndex:indexBeforeUpdate];
-            [self sort];
             
-            NSUInteger indexAfterUpdate = [self indexOf:localModel];
-            BOOL modelDidMove = indexBeforeUpdate != indexAfterUpdate;
-            
-            if (modelDidMove)
-            {
-                [self modelMoved:localModel fromIndex:indexBeforeUpdate toIndex:indexAfterUpdate];
+            if (self.sortUpdate) {
+                
+                [self sort];
+                
+                NSUInteger indexAfterUpdate = [self indexOf:localModel];
+                BOOL modelDidMove = indexBeforeUpdate != indexAfterUpdate;
+                
+                if (modelDidMove)
+                {
+                    [self modelMoved:localModel fromIndex:indexBeforeUpdate toIndex:indexAfterUpdate];
+                }
+                
             }
         }
     }

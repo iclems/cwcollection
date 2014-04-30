@@ -73,6 +73,7 @@ typedef void (^CWCollectionPrepareResult)(id <CWCollectionModelProtocol> model, 
 
 @property (nonatomic, assign) id <CWCollectionDelegate> delegate;
 @property (nonatomic, assign) id <CWCollectionDataSource> dataSource;
+@property (nonatomic, assign) BOOL sortUpdate; // if the collection should be sorted after an update/move
 
 - (void)addModel:(id <CWCollectionModelProtocol>)model;
 - (void)addModel:(id <CWCollectionModelProtocol>)model silent:(BOOL)silent;
