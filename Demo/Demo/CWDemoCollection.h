@@ -8,6 +8,6 @@
 
 #import "CWFirebaseCollection.h"
 
-@interface CWDemoCollection : CWFirebaseCollection <CWFirebaseCollectionDataSource>
+@interface CWDemoCollection : CWFirebaseCollection
 
 @end

@@ -10,29 +10,17 @@
 
 @implementation CWDemoModel
 
-- (id)initWithIdentifier:(NSString *)identifier andDictionary:(NSDictionary *)dictionary
-{
-    if (self = [super init]) {
-        _identifier = identifier;
-        [self updateWithDictionary:dictionary];
-    }
-    return self;
-}
+/**
+ * managedProperties declares the properties which should be automatically synced:
+ * @{ localPropertyName: remotePropertyName }
+ */
 
-- (void)updateWithDictionary:(NSDictionary *)dictionary
+- (NSDictionary *)managedProperties
 {
-    _contentSnippet = dictionary[@"contentSnippet"];
-    _link = dictionary[@"link"];
-    _title = dictionary[@"title"];
-    _url = dictionary[@"url"];
-}
-
-- (NSDictionary *)dictionary
-{
-    return @{ @"contentSnippet": _contentSnippet,
-              @"link": _link,
-              @"title": _title,
-              @"url": _url
+    return @{ @"contentSnippet": @"contentSnippet",
+              @"link": @"link",
+              @"title": @"title",
+              @"url": @"url"
             };
 }
 

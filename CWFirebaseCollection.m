@@ -296,11 +296,18 @@
 - (void)collection:(CWCollection *)collection prepareModelWithData:(FDataSnapshot *)snapshot completion:(CWCollectionPrepareResult)completionBlock
 {
     assert(self.modelClass);
-
-    Class class = self.modelClass;
     
-    id model = [[class alloc] initWithIdentifier:snapshot.name];
-    [model updateWithDictionary:snapshot.valueInExportFormat];
+    id model = nil;
+    
+    if (snapshot && ![snapshot isKindOfClass:NSNull.class]) {
+
+        Class class = self.modelClass;
+        
+        model = [[class alloc] initWithIdentifier:snapshot.name];
+        [model updateWithDictionary:snapshot.valueInExportFormat];
+        
+    }
+
     completionBlock(model, snapshot);
 }
 

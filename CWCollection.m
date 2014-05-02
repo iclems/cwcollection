@@ -6,6 +6,7 @@
 //
 
 #import "CWCollection.h"
+#import "CWModel.h"
 
 @interface CWCollection()
 

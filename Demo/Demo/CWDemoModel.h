@@ -9,18 +9,13 @@
 #import <Foundation/Foundation.h>
 
 #import "CWFirebaseCollection.h"
+#import "CWModel.h"
 
-@interface CWDemoModel : NSObject <CWCollectionModelProtocol>
+@interface CWDemoModel : CWModel
 
-@property (nonatomic, strong) NSString *identifier;
 @property (nonatomic, strong) NSString *contentSnippet;
 @property (nonatomic, strong) NSString *link;
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, strong) NSString *url;
-
-- (id)initWithIdentifier:(NSString *)identifier andDictionary:(NSDictionary *)dictionary;
-
-- (void)updateWithDictionary:(NSDictionary *)dictionary;
-- (NSDictionary *)dictionary;
 
 @end

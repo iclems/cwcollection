@@ -6,26 +6,9 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "CWCollectionModelProtocol.h"
 
 @class CWCollection;
-
-/**
- * CWCollectionModelProtocol
- */
-
-@protocol CWCollectionModelProtocol <NSObject>
-
-@required
-
-- (NSString *)identifier;
-- (NSDictionary *)dictionary;
-- (BOOL)updateWithDictionary:(NSDictionary *)dictionary;
-
-@optional
-
-@property (nonatomic, assign) CWCollection *collection;
-
-@end
 
 /**
  * CWCollectionDataSource

@@ -24,33 +24,29 @@
     _collection = [[CWDemoCollection alloc] init];
     _collection.delegate = self;
     
-    [self loadMore];
+    [self loadMore:YES];
 }
 
-- (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView
-{
-    [_loadingIndicator startAnimating];
-}
 
-// You can make the progressive scrolling smoother by moving all the following into scrollViewWillBeginDecelerating:
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-    [_loadingIndicator stopAnimating];
-
     NSIndexPath *indexPath = [self.tableView indexPathsForVisibleRows].lastObject;
     
     if (!self.collection.isLoading && indexPath.row > self.collection.count - 5)
     {
-        [self loadMore];
+        [self loadMore:NO];
     }
 }
 
-- (void)loadMore
+- (void)loadMore:(BOOL)animated
 {
     __weak CWViewController *this = self;
     
     [self.collection loadMoreWithCompletion:^(CWCollection *collection, NSArray *models) {
-        [_tableView insertRowsAtIndexPaths:[this indexPathsWithModels:models] withRowAnimation:UITableViewRowAnimationAutomatic];
+        if (!models.count) return;
+        [UIView setAnimationsEnabled:animated];
+        [this.tableView insertRowsAtIndexPaths:[this indexPathsWithModels:models] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [UIView setAnimationsEnabled:YES];
     }];
 }
 
