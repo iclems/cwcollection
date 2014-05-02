@@ -55,6 +55,10 @@
                 if ([expectedClass isSubclassOfClass:NSDate.class] && [remoteValue isKindOfClass:NSNumber.class]) {
                     remoteValue = [NSDate dateFromJavascriptTimestamp:remoteValue];
                 }
+                
+                if ([expectedClass isSubclassOfClass:NSString.class]) {
+                    remoteValue = [NSString stringWithFormat:@"%@", remoteValue];
+                }
 
             }
             
