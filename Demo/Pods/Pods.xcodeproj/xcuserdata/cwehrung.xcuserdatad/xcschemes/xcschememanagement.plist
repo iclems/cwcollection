@@ -4,6 +4,21 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>Pods-Block-KVO.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>Pods-DTCoreText.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>Pods-DTFoundation.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>Pods-Firebase.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -17,12 +32,27 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>2B994B31FE8C42D79F938EC0</key>
+		<key>41FEC61608F04BEF95B96A9A</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>E20B3BE0ADB64444876E833D</key>
+		<key>67692F5053DE41339F3C0C05</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>93C76C433A0040A6A5530492</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>C778DEADFA474C789F3DDCCD</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>F89F54504FDA45C9A5D6E7A8</key>
 		<dict>
 			<key>primary</key>
 			<true/>

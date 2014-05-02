@@ -8,6 +8,9 @@
 
 #import "CWViewController.h"
 #import "CWDemoModel.h"
+#import "CWDemoTableViewCell.h"
+
+#import <Block-KVO/MTKObserving.h>
 
 @interface CWViewController ()
 
@@ -99,30 +102,17 @@
 {
     static NSString *CellIdentifier = @"Cell";
     
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    CWDemoTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
-    }
-    
-    CWDemoModel *model = [_collection.models objectAtIndex:indexPath.row];
-
-    cell.textLabel.attributedText = [self attributedStringFromHTMLString:model.title];
-    cell.detailTextLabel.attributedText = [self attributedStringFromHTMLString:model.contentSnippet];
+    cell.model = [_collection.models objectAtIndex:indexPath.row];
     
     return cell;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 80;
-}
-
-- (NSAttributedString *)attributedStringFromHTMLString:(NSString *)html
-{
-    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithData:[html dataUsingEncoding:NSUTF8StringEncoding] options:@{NSDocumentTypeDocumentAttribute:NSHTMLTextDocumentType} documentAttributes:nil error:nil];
-    
-    return attributedString;
+    CWDemoModel *model = [_collection.models objectAtIndex:indexPath.row];
+    [model removeAllObservations];
 }
 
 #pragma mark - Index Helpers
