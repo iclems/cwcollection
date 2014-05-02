@@ -29,7 +29,7 @@
 @end
 
 
-@protocol CWFirebaseCollectionDataSource <NSObject>
+@protocol CWFirebaseCollectionDataSource <CWCollectionDataSource>
 
 @required
 
@@ -37,7 +37,7 @@
 
 @end
 
-@interface CWFirebaseCollection : CWCollection
+@interface CWFirebaseCollection : CWCollection <CWFirebaseCollectionDataSource>
 
 @property (nonatomic, strong, readonly) Firebase* reference;
 @property (nonatomic, assign, readonly) BOOL isLoading;
@@ -55,5 +55,9 @@
 
 - (void)startListeners;
 - (void)startListeningForNew;
+
+#pragma mark - Default Model Implementation
+
+- (void)collection:(CWCollection *)collection prepareModelWithData:(FDataSnapshot *)snapshot completion:(CWCollectionPrepareResult)completionBlock;
 
 @end

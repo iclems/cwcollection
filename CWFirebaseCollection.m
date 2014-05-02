@@ -8,6 +8,7 @@
 #import <objc/runtime.h>
 
 #import "CWFirebaseCollection.h"
+#import "CWModel.h"
 
 @interface CWFirebaseCollection()
 
@@ -33,6 +34,16 @@
         _autoStartListeners = YES;
         
         self.dataSource = dataSource;
+    }
+    return self;
+}
+
+- (id)init
+{
+    if (self.reference && self.modelClass) {
+        self = [self initWithReference:self.reference dataSource:self];
+    } else {
+        self = [super init];
     }
     return self;
 }
@@ -278,6 +289,19 @@
         void (*func)(id, SEL, CWCollection *) = (void *)imp;
         func(self.delegate, selector, self);
     }
+}
+
+#pragma mark - Default Model Implementation
+
+- (void)collection:(CWCollection *)collection prepareModelWithData:(FDataSnapshot *)snapshot completion:(CWCollectionPrepareResult)completionBlock
+{
+    assert(self.modelClass);
+
+    Class class = self.modelClass;
+    
+    id model = [[class alloc] initWithIdentifier:snapshot.name];
+    [model updateWithDictionary:snapshot.valueInExportFormat];
+    completionBlock(model, snapshot);
 }
 
 @end
