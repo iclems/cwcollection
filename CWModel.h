@@ -1,9 +1,8 @@
 //
 //  CWModel.h
-//  LiveMinutes
 //
 //  Created by Clément Wehrung on 01/05/2014.
-//  Copyright (c) 2014 Live Minutes. All rights reserved.
+//  Copyright (c) 2014 Clément Wehrung. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
