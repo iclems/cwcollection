@@ -311,4 +311,17 @@
     completionBlock(model, snapshot);
 }
 
+#pragma mark - Model
+
+- (void)addModel:(id <CWCollectionModelProtocol>)model
+{
+    if (!model.identifier) {
+        Firebase *modelRef = [self.reference childByAutoId];
+        model.identifier = modelRef.name;
+        [modelRef setValue:model.dictionary];
+    }
+    
+    return [super addModel:model silent:NO];
+}
+
 @end

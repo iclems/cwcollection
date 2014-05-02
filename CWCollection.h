@@ -71,6 +71,9 @@ typedef void (^CWCollectionPrepareResult)(id <CWCollectionModelProtocol> model, 
 
 - (NSUInteger)indexOf:(id <CWCollectionModelProtocol>)model;
 - (BOOL)hasModel:(id <CWCollectionModelProtocol>)model;
+- (id)objectAtIndex:(NSUInteger)index;
+- (id)objectForKeyedSubscript:(id)key;
+- (id)objectAtIndexedSubscript:(NSUInteger)index;
 
 // Internal methods
 

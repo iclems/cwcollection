@@ -18,7 +18,8 @@
 
 @required
 
-- (NSString *)identifier;
+@property (nonatomic, strong) NSString *identifier;
+
 - (NSDictionary *)dictionary;
 - (BOOL)updateWithDictionary:(NSDictionary *)dictionary;
 

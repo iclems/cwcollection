@@ -8,6 +8,8 @@
 #import "CWCollection.h"
 #import "CWModel.h"
 
+#define IS_OBJECT(T) _Generic( (T), id: YES, default: NO)
+
 @interface CWCollection()
 
 @property (nonatomic, strong, readwrite) NSMutableArray *models;
@@ -186,6 +188,21 @@
 - (id)objectForKey:(id)aKey
 {
     return [_dictionary objectForKey:aKey];
+}
+
+- (id)objectAtIndex:(NSUInteger)index
+{
+    return [_models objectAtIndex:index];
+}
+
+- (id)objectForKeyedSubscript:(id)key
+{
+    return self.dictionary[key];
+}
+
+- (id)objectAtIndexedSubscript:(NSUInteger)index
+{
+    return self.models[index];
 }
 
 - (NSEnumerator *)keyEnumerator
