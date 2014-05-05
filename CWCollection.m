@@ -197,12 +197,12 @@
 
 - (id)objectForKeyedSubscript:(id)key
 {
-    return self.dictionary[key];
+    return [self.dictionary objectForKey:key];
 }
 
 - (id)objectAtIndexedSubscript:(NSUInteger)index
 {
-    return self.models[index];
+    return [self.models objectAtIndex:index];
 }
 
 - (NSEnumerator *)keyEnumerator
