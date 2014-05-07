@@ -26,7 +26,6 @@
     if (self = [super init]) {
         _dictionary = [NSMutableDictionary dictionary];
         _models = [NSMutableArray array];
-        _sortUpdate = YES;
     }
 	return self;
 }
@@ -50,33 +49,18 @@
     }
 }
 
-- (NSUInteger)indexForInsertingModel:(id <CWCollectionModelProtocol>)model
-{
-    NSUInteger index = [self indexForInsertingModels:model inModels:self.models];
-    // If no sort comparator, append after last model
-    return (index == NSNotFound) ? self.models.count : index;
-}
-
-- (NSUInteger)indexAfterChangingModel:(id <CWCollectionModelProtocol>)model
-{
-    NSUInteger indexBefore = [self.models indexOfObject:model];
-    NSMutableArray *mutableModels = self.models.mutableCopy;
-    [mutableModels removeObjectAtIndex:indexBefore];
-    NSUInteger indexAfter = [self indexForInsertingModels:model inModels:mutableModels];
-    return (indexAfter == NSNotFound) ? indexBefore : indexAfter;
-}
-
 /**
  * @return Provides the insert index of the model in the array. If no sort comparator is found, returns NSNotFound.
  **/
 
-- (NSUInteger)indexForInsertingModels:(id <CWCollectionModelProtocol>)model inModels:(NSArray *)models
+- (NSUInteger)indexForInsertingModel:(id <CWCollectionModelProtocol>)model
 {
+    NSUInteger topIndex = self.models.count;
+
     if (self.dataSource && [self.dataSource respondsToSelector:@selector(collection:sortCompareModel:withModel:)])
     {
         // Inspired from: http://www.jayway.com/2009/03/28/adding-sorted-inserts-to-uimutablearray/
         
-        NSUInteger topIndex = self.models.count;
         NSUInteger index = 0;
         
         while (index < topIndex) {
@@ -92,7 +76,7 @@
         return index;
     }
     
-    return NSNotFound;
+    return topIndex;
 }
 
 #pragma mark - Accessors
@@ -195,20 +179,17 @@
         if (!silent && didChange)
         {
             [self modelUpdated:localModel atIndex:indexBeforeUpdate];
+            [self sort];
             
-            if (self.sortUpdate) {
+            NSUInteger indexAfterUpdate = [self indexOf:localModel];
+            BOOL modelDidMove = indexBeforeUpdate != indexAfterUpdate;
+            
+            if (modelDidMove)
+            {
+                [self.models removeObject:localModel];
+                [self.models insertObject:localModel atIndex:indexAfterUpdate];
                 
-                NSUInteger indexAfterUpdate = [self indexAfterChangingModel:localModel];
-                BOOL modelDidMove = indexBeforeUpdate != indexAfterUpdate;
-                
-                if (modelDidMove)
-                {
-                    [self.models removeObject:localModel];
-                    [self.models insertObject:localModel atIndex:indexAfterUpdate];
-                    
-                    [self modelMoved:localModel fromIndex:indexBeforeUpdate toIndex:indexAfterUpdate];
-                }
-                
+                [self modelMoved:localModel fromIndex:indexBeforeUpdate toIndex:indexAfterUpdate];
             }
         }
     }
