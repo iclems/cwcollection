@@ -59,6 +59,9 @@ typedef void (^CWCollectionPrepareResult)(id <CWCollectionModelProtocol> model, 
 @property (nonatomic, assign) BOOL sortUpdate; // if the collection should be sorted after an update/move
 @property (nonatomic, assign) Class modelClass;
 
+- (id <CWCollectionModelProtocol>)modelWithIdentifier:(NSString *)identifier;
+- (id)modelAtIndex:(NSUInteger)index;
+
 - (void)addModel:(id <CWCollectionModelProtocol>)model;
 - (void)addModel:(id <CWCollectionModelProtocol>)model silent:(BOOL)silent;
 - (void)removeModel:(id <CWCollectionModelProtocol>)model;
@@ -68,12 +71,12 @@ typedef void (^CWCollectionPrepareResult)(id <CWCollectionModelProtocol> model, 
 
 - (void)sort;
 - (NSUInteger)count;
-
 - (NSUInteger)indexOf:(id <CWCollectionModelProtocol>)model;
 - (BOOL)hasModel:(id <CWCollectionModelProtocol>)model;
-- (id)objectAtIndex:(NSUInteger)index;
+
 - (id)objectForKeyedSubscript:(id)key;
 - (id)objectAtIndexedSubscript:(NSUInteger)index;
+- (id)objectAtIndex:(NSUInteger)index;
 
 // Internal methods
 

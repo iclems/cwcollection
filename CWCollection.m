@@ -31,19 +31,94 @@
 	return self;
 }
 
-#pragma mark - Models Management
+#pragma mark - Sort
+
+/** 
+ * Sort
+ * Performs a full resort of the collection. Never called internally. Beware, the delegate won't be called with model 
+ **/
 
 - (void)sort
 {
     if (self.dataSource && [self.dataSource respondsToSelector:@selector(collection:sortCompareModel:withModel:)])
     {
-        __weak CWCollection *this = self;
+        __weak CWCollection *weakSelf = self;
         
-        [_models sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-            return [this.dataSource collection:this sortCompareModel:obj1 withModel:obj2];
+        [self.models sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+            return [weakSelf.dataSource collection:weakSelf sortCompareModel:obj1 withModel:obj2];
         }];
     }
 }
+
+- (NSUInteger)indexForInsertingModel:(id <CWCollectionModelProtocol>)model
+{
+    NSUInteger index = [self indexForInsertingModels:model inModels:self.models];
+    // If no sort comparator, append after last model
+    return (index == NSNotFound) ? self.models.count : index;
+}
+
+- (NSUInteger)indexAfterChangingModel:(id <CWCollectionModelProtocol>)model
+{
+    NSUInteger indexBefore = [self.models indexOfObject:model];
+    NSMutableArray *mutableModels = self.models.mutableCopy;
+    [mutableModels removeObjectAtIndex:indexBefore];
+    NSUInteger indexAfter = [self indexForInsertingModels:model inModels:mutableModels];
+    return (indexAfter == NSNotFound) ? indexBefore : indexAfter;
+}
+
+/**
+ * @return Provides the insert index of the model in the array. If no sort comparator is found, returns NSNotFound.
+ **/
+
+- (NSUInteger)indexForInsertingModels:(id <CWCollectionModelProtocol>)model inModels:(NSArray *)models
+{
+    if (self.dataSource && [self.dataSource respondsToSelector:@selector(collection:sortCompareModel:withModel:)])
+    {
+        // Inspired from: http://www.jayway.com/2009/03/28/adding-sorted-inserts-to-uimutablearray/
+        
+        NSUInteger topIndex = self.models.count;
+        NSUInteger index = 0;
+        
+        while (index < topIndex) {
+            NSUInteger midIndex = (index + topIndex) / 2;
+            id <CWCollectionModelProtocol> testModel = [self.models objectAtIndex:midIndex];
+            if ([self.dataSource collection:self sortCompareModel:model withModel:testModel] > 0) {
+                index = midIndex + 1;
+            } else {
+                topIndex = midIndex;
+            }
+        }
+        
+        return index;
+    }
+    
+    return NSNotFound;
+}
+
+#pragma mark - Accessors
+
+- (id <CWCollectionModelProtocol>)modelWithIdentifier:(NSString *)identifier
+{
+    return [self.dictionary objectForKey:identifier];
+}
+
+
+- (id)modelAtIndex:(NSUInteger)index
+{
+    return [self.models objectAtIndex:index];
+}
+
+- (NSUInteger)indexOf:(id <CWCollectionModelProtocol>)model
+{
+    return [self.models indexOfObject:model];
+}
+
+- (BOOL)hasModel:(id <CWCollectionModelProtocol>)model
+{
+    return [self modelWithIdentifier:model.identifier] ? YES : NO;
+}
+
+#pragma mark - Add / Change / Move / Remove
 
 - (void)addModel:(id <CWCollectionModelProtocol>)model
 {
@@ -52,18 +127,22 @@
 
 - (void)addModel:(id <CWCollectionModelProtocol>)model silent:(BOOL)silent
 {
-    id localModel = [self objectForKey:model.identifier];
+    id localModel = [self modelWithIdentifier:model.identifier];
     if (!localModel)
     {
         if ([model respondsToSelector:@selector(setCollection:)]) {
             model.collection = self;
         }
         
-        [self setObject:model forKey:model.identifier];
-        [self sort];
+        if (![self.dictionary objectForKey:model.identifier])
+        {
+            NSUInteger insertIndex = [self indexForInsertingModel:model];
+            [self.models insertObject:model atIndex:insertIndex];
+            [self.dictionary setObject:model forKey:model.identifier];
         
-        if (!silent) {
-            [self modelAdded:model atIndex:[self indexOf:model]];
+            if (!silent) {
+                [self modelAdded:model atIndex:insertIndex];
+            }
         }
     }
 }
@@ -85,12 +164,13 @@
 
 - (void)removeModelWithIdentifier:(NSString *)identifier silent:(BOOL)silent
 {
-    id <CWCollectionModelProtocol> localModel = [self objectForKey:identifier];
+    id <CWCollectionModelProtocol> localModel = [self modelWithIdentifier:identifier];
     if (localModel)
     {
         NSUInteger index = [self indexOf:localModel];
         
-        [self removeObjectForKey:identifier];
+        [self.models removeObject:[_dictionary objectForKey:identifier]];
+        [self.dictionary removeObjectForKey:identifier];
         
         if (!silent) {
             [self modelRemoved:localModel atIndex:index];
@@ -105,7 +185,7 @@
 
 - (void)updateModel:(id <CWCollectionModelProtocol>)model silent:(BOOL)silent
 {
-    id localModel = [self objectForKey:model.identifier];
+    id localModel = [self modelWithIdentifier:model.identifier];
     if (localModel)
     {
         NSUInteger indexBeforeUpdate = [self indexOf:localModel];
@@ -118,13 +198,14 @@
             
             if (self.sortUpdate) {
                 
-                [self sort];
-                
-                NSUInteger indexAfterUpdate = [self indexOf:localModel];
+                NSUInteger indexAfterUpdate = [self indexAfterChangingModel:localModel];
                 BOOL modelDidMove = indexBeforeUpdate != indexAfterUpdate;
                 
                 if (modelDidMove)
                 {
+                    [self.models removeObject:localModel];
+                    [self.models insertObject:localModel atIndex:indexAfterUpdate];
+                    
                     [self modelMoved:localModel fromIndex:indexBeforeUpdate toIndex:indexAfterUpdate];
                 }
                 
@@ -137,63 +218,33 @@
 
 - (void)modelAdded:(id <CWCollectionModelProtocol>)model atIndex:(NSUInteger)index
 {
-    if ([_delegate respondsToSelector:@selector(collection:modelAdded:atIndex:)]) {
-        [_delegate collection:self modelAdded:model atIndex:index];
+    if ([self.delegate respondsToSelector:@selector(collection:modelAdded:atIndex:)]) {
+        [self.delegate collection:self modelAdded:model atIndex:index];
     }
 }
 
 - (void)modelRemoved:(id <CWCollectionModelProtocol>)model atIndex:(NSUInteger)index
 {
-    if ([_delegate respondsToSelector:@selector(collection:modelRemoved:atIndex:)]) {
-        [_delegate collection:self modelRemoved:model atIndex:index];
+    if ([self.delegate respondsToSelector:@selector(collection:modelRemoved:atIndex:)]) {
+        [self.delegate collection:self modelRemoved:model atIndex:index];
     }
 }
 
 - (void)modelUpdated:(id <CWCollectionModelProtocol>)model atIndex:(NSUInteger)index
 {
-    if ([_delegate respondsToSelector:@selector(collection:modelUpdated:atIndex:)]) {
-        [_delegate collection:self modelUpdated:model atIndex:index];
+    if ([self.delegate respondsToSelector:@selector(collection:modelUpdated:atIndex:)]) {
+        [self.delegate collection:self modelUpdated:model atIndex:index];
     }
 }
 
 - (void)modelMoved:(id <CWCollectionModelProtocol>)model fromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex
 {
-    if ([_delegate respondsToSelector:@selector(collection:modelMoved:fromIndex:toIndex:)]) {
-        [_delegate collection:self modelMoved:model fromIndex:fromIndex toIndex:toIndex];
+    if ([self.delegate respondsToSelector:@selector(collection:modelMoved:fromIndex:toIndex:)]) {
+        [self.delegate collection:self modelMoved:model fromIndex:fromIndex toIndex:toIndex];
     }
 }
 
-#pragma mark - NSMutableDictionary
-
-- (void)setObject:(id)anObject forKey:(id)aKey
-{
-    if (![_dictionary objectForKey:aKey])
-    {
-        [_models addObject:anObject];
-        [_dictionary setObject:anObject forKey:aKey];
-    }
-}
-
-- (void)removeObjectForKey:(id)aKey
-{
-    [_models removeObject:[_dictionary objectForKey:aKey]];
-    [_dictionary removeObjectForKey:aKey];
-}
-
-- (NSUInteger)count
-{
-    return [_models count];
-}
-
-- (id)objectForKey:(id)aKey
-{
-    return [_dictionary objectForKey:aKey];
-}
-
-- (id)objectAtIndex:(NSUInteger)index
-{
-    return [_models objectAtIndex:index];
-}
+#pragma mark - Compliance
 
 - (id)objectForKeyedSubscript:(id)key
 {
@@ -202,25 +253,22 @@
 
 - (id)objectAtIndexedSubscript:(NSUInteger)index
 {
-    return [self.models objectAtIndex:index];
+    return [self modelAtIndex:index];
+}
+
+- (id)objectAtIndex:(NSUInteger)index
+{
+    return [self modelAtIndex:index];
 }
 
 - (NSEnumerator *)keyEnumerator
 {
-    return [_models objectEnumerator];
+    return [self.models objectEnumerator];
 }
 
-#pragma mark - Helpers
-
-- (NSUInteger)indexOf:(id <CWCollectionModelProtocol>)model
+- (NSUInteger)count
 {
-    return [_models indexOfObject:model];
-}
-
-- (BOOL)hasModel:(id <CWCollectionModelProtocol>)model
-{
-    // hasObject is not used as it may lead to duplicates
-    return [self objectForKey:model.identifier] ? YES : NO;
+    return [self.models count];
 }
 
 @end
