@@ -48,6 +48,7 @@
 @property (nonatomic, assign) NSUInteger batchSize;
 @property (nonatomic, assign) BOOL isAscending;
 @property (nonatomic, assign) BOOL autoStartListeners;
+@property (nonatomic, assign, readonly) BOOL hasMore;
 
 - (id)initWithReference:(Firebase *)reference dataSource:(id <CWFirebaseCollectionDataSource>)dataSource;
 - (void)loadAllWithCompletion:(void (^)(CWCollection *collection, NSArray *models))completion;

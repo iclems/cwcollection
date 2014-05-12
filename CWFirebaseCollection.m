@@ -14,6 +14,7 @@
 
 @property (nonatomic, strong, readwrite) Firebase* reference;
 @property (nonatomic, assign, readwrite) BOOL isLoading;
+@property (nonatomic, assign, readwrite) BOOL hasMore;
 
 @property (nonatomic, strong) NSMutableDictionary *eventHandles;
 @property (nonatomic, strong) NSMutableArray *currentBatchModels;
@@ -32,6 +33,7 @@
         _isLoading = NO;
         _batchSize = 0;
         _autoStartListeners = YES;
+        _hasMore = YES;
         
         self.dataSource = dataSource;
     }
@@ -153,7 +155,7 @@
 
 - (void)runQueryWithLimit:(NSUInteger)limit completion:(void (^)(CWCollection *collection, NSArray *models))completion
 {
-    if (self.isLoading) return completion(self, @[]);
+    if (self.isLoading || !self.hasMore) return completion(self, @[]);
     else self.isLoading = YES;
     
     [self.currentBatchModels  removeAllObjects];
@@ -181,6 +183,10 @@
         void (^readyBlock)() = ^() {
             
             this.isLoading = batchLoading = NO;
+            
+            if (!limit || totalCount < limit - 1) {
+                this.hasMore = NO;
+            }
             
             if (completion) {
                 completion(this, this.currentBatchModels);
@@ -224,7 +230,6 @@
                 [this updateModel:model silent:YES];
             }
             
-            // If collection is empty, no snapshot
             if (snapshot) {
                 if (preparedSnapshots[snapshot.name]) return;
                 else [preparedSnapshots setObject:@(YES) forKey:snapshot.name];
