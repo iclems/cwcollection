@@ -155,7 +155,13 @@
 
 - (void)runQueryWithLimit:(NSUInteger)limit completion:(void (^)(CWCollection *collection, NSArray *models))completion
 {
-    if (self.isLoading || !self.hasMore) return completion(self, @[]);
+    NSAssert(completion, @"A completion block is required.");
+    
+    void(^errorBlock)() = ^() {
+        completion(self, @[]);
+    };
+    
+    if (self.isLoading || !self.hasMore) return errorBlock();
     else self.isLoading = YES;
     
     [self.currentBatchModels  removeAllObjects];
@@ -269,6 +275,8 @@
             
             enumIndex++;
         }        
+    } withCancelBlock:^(NSError *error) {
+        errorBlock();
     }];
 }
 
