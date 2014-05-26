@@ -17,7 +17,7 @@
 @property (nonatomic, assign, readwrite) BOOL hasMore;
 
 @property (nonatomic, strong) NSMutableDictionary *eventHandles;
-@property (nonatomic, strong) NSMutableArray *currentBatchModels;
+@property (nonatomic, strong) NSMutableDictionary *currentBatchModels;
 @property (nonatomic, strong, readwrite) FDataSnapshot *lastDataSnapshot;
 
 @end
@@ -29,7 +29,7 @@
     if (self = [super init])
     {
         _reference = reference;
-        _currentBatchModels = [NSMutableArray array];
+        _currentBatchModels = [NSMutableDictionary dictionary];
         _isLoading = NO;
         _batchSize = 0;
         _autoStartListeners = YES;
@@ -88,8 +88,11 @@
 
         [this.dataSource collection:this prepareModelWithData:snapshot completion:^(id <CWCollectionModelProtocol> model, FDataSnapshot *snapshot) {
             
-            if (!model) return;
-            else if ([this hasModel:model])
+            if (!model) { return; }
+            
+            assert([model conformsToProtocol:@protocol(CWCollectionModelProtocol)]);
+            
+            if ([this hasModel:model])
             {
                 [this updateModel:model silent:NO];
             }
@@ -194,8 +197,17 @@
                 this.hasMore = NO;
             }
             
+            for (id <CWCollectionModelProtocol> model in this.currentBatchModels.allValues)
+            {
+                if (model && ![this hasModel:model]) {
+                    [this addModel:model];
+                } else if (model) {
+                    [this updateModel:model silent:YES];
+                }
+            }
+            
             if (completion) {
-                completion(this, this.currentBatchModels);
+                completion(this, this.currentBatchModels.allValues);
             }
             
             [this startListeners];
@@ -227,18 +239,13 @@
                 return model ? [this updateModel:model silent:NO] : nil;
             }
             
-            if (model && ![this hasModel:model])
-            {
-                [this.currentBatchModels addObject:model];
-                [this addModel:model];
-            }
-            else if (model) {
-                [this updateModel:model silent:YES];
-            }
-            
             if (snapshot) {
                 if (preparedSnapshots[snapshot.name]) return;
                 else [preparedSnapshots setObject:@(YES) forKey:snapshot.name];
+            }
+            
+            if (model) {
+                [this.currentBatchModels setObject:model forKey:model.identifier];
             }
             
             if (preparedSnapshots.count == totalCount)
@@ -284,7 +291,7 @@
 {
     [super modelAdded:model atIndex:index];
     
-    BOOL inBatch = [self.currentBatchModels indexOfObject:model] != NSNotFound;
+    BOOL inBatch = [self.currentBatchModels objectForKey:model.identifier] != nil;
     
     if ([self.delegate respondsToSelector:@selector(collection:modelAdded:atIndex:inBatch:)]) {
         [self.delegate collection:self modelAdded:model atIndex:index inBatch:inBatch];
