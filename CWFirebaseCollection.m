@@ -79,22 +79,22 @@
         query = [self.reference queryStartingAtPriority:self.lastDataSnapshot.priority andChildName:self.lastDataSnapshot.name];
     }
     
-    __weak CWFirebaseCollection *this = self;
+    __weak CWFirebaseCollection *weakSelf = self;
     FirebaseHandle handle;
     
     handle = [query observeEventType:FEventTypeChildAdded withBlock:^(FDataSnapshot *snapshot) {
 
         __block BOOL processed = NO;
 
-        [this.dataSource collection:this prepareModelWithData:snapshot completion:^(id <CWCollectionModelProtocol> model, FDataSnapshot *snapshot) {
+        [weakSelf.dataSource collection:weakSelf prepareModelWithData:snapshot completion:^(id <CWCollectionModelProtocol> model, FDataSnapshot *snapshot) {
             
             if (!model) { return; }
             
             assert([model conformsToProtocol:@protocol(CWCollectionModelProtocol)]);
             
-            if ([this hasModel:model])
+            if ([weakSelf hasModel:model])
             {
-                [this updateModel:model silent:NO];
+                [weakSelf updateModel:model silent:NO];
             }
             else if (!processed)
             {
@@ -102,7 +102,7 @@
                 // Otherwise, a model could have been removed in the meantime, but receive
                 // echo from prepareModelWithData:completion: as it may be still listening to somethig else
                 // TODO: it would be nice to receive a cancellable FOperation: we could cancel it from here
-                [this addModel:model];
+                [weakSelf addModel:model];
             }
             processed = YES;
         }];
@@ -115,14 +115,14 @@
 {
     if (_eventHandles[@(eventType)]) return;
 
-    __weak CWFirebaseCollection *this = self;
+    __weak CWFirebaseCollection *weakSelf = self;
     FirebaseHandle handle;
     
     handle = [self.reference observeEventType:eventType withBlock:^(FDataSnapshot *snapshot) {
-        if ([this respondsToSelector:selector]) {
-            IMP imp = class_getMethodImplementation(this.class, selector);
+        if ([weakSelf respondsToSelector:selector]) {
+            IMP imp = class_getMethodImplementation(weakSelf.class, selector);
             void (*func)(id, SEL, FDataSnapshot *) = (void *)imp;
-            func(this, selector, snapshot);
+            func(weakSelf, selector, snapshot);
         }
     }];
     
@@ -136,11 +136,11 @@
 
 - (void)remoteModelDidChangeWithSnapshot:(FDataSnapshot *)snapshot
 {
-    __weak CWFirebaseCollection *this = self;
+    __weak CWFirebaseCollection *weakSelf = self;
     
     [self.dataSource collection:self prepareModelWithData:snapshot completion:^(id <CWCollectionModelProtocol> model, FDataSnapshot *snapshot) {
         if (model) {
-            [this updateModel:model];
+            [weakSelf updateModel:model];
         }
     }];
 
@@ -181,37 +181,38 @@
         startDataSnapshotName = self.lastDataSnapshot.name;
     }
     
-    __weak CWFirebaseCollection *this = self;
+    __weak CWFirebaseCollection *weakSelf = self;
     __block BOOL batchLoading = YES;
     
     [query observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
         
-        __block NSUInteger totalCount = snapshot.childrenCount - (this.lastDataSnapshot ? 1 : 0);
+        __block NSUInteger totalCount = snapshot.childrenCount - (weakSelf.lastDataSnapshot ? 1 : 0);
         __block NSMutableDictionary *preparedSnapshots = [NSMutableDictionary dictionary];
         
         void (^readyBlock)() = ^() {
             
-            this.isLoading = batchLoading = NO;
+            weakSelf.isLoading = batchLoading = NO;
             
             if (!limit || totalCount < limit - 1) {
-                this.hasMore = NO;
+                weakSelf.hasMore = NO;
             }
             
-            for (id <CWCollectionModelProtocol> model in this.currentBatchModels.allValues)
+            for (id <CWCollectionModelProtocol> model in weakSelf.currentBatchModels.allValues)
             {
-                if (model && ![this hasModel:model]) {
-                    [this addModel:model];
-                } else if (model) {
-                    [this updateModel:model silent:YES];
+                if (![weakSelf hasModel:model]) {
+                    [weakSelf addModel:model];
+                } else {
+                    [weakSelf updateModel:model silent:YES];
                 }
             }
             
             if (completion) {
-                completion(this, this.currentBatchModels.allValues);
+                completion(weakSelf, weakSelf.currentBatchModels.allValues);
             }
             
-            [this startListeners];
+            [weakSelf startListeners];
             
+            [weakSelf.currentBatchModels removeAllObjects];
             preparedSnapshots = nil;
         };
         
@@ -230,13 +231,13 @@
             if (!batchLoading) {
                 
                 // Query already completed, but receives new data updates.
-                // This is due to Firebase Offline cache which forces us to accept
+                // weakSelf is due to Firebase Offline cache which forces us to accept
                 // multiple completion callbacks per location (1. cache, 2. remote value).
                 // Yet, once we have received 1 callback per location, the query is
                 // considered completed (otherwise, it may never complete: e.g. if one child
                 // was indeed removed, it won't be called twice with NSNull)
                 
-                return model ? [this updateModel:model silent:NO] : nil;
+                return model ? [weakSelf updateModel:model silent:NO] : nil;
             }
             
             if (snapshot) {
@@ -245,7 +246,7 @@
             }
             
             if (model) {
-                [this.currentBatchModels setObject:model forKey:model.identifier];
+                [weakSelf.currentBatchModels setObject:model forKey:model.identifier];
             }
             
             if (preparedSnapshots.count == totalCount)
@@ -259,7 +260,7 @@
         }
 
         NSUInteger enumIndex = 0;
-        NSUInteger lastDataIndex = this.isAscending ? (snapshot.childrenCount - 1) : 0;
+        NSUInteger lastDataIndex = weakSelf.isAscending ? (snapshot.childrenCount - 1) : 0;
         
         // TODO: snapshot.children should be reversed if not ascending
         // But snapshot.children.allObjects.reverseEnumerator does not seem to work for now
@@ -270,13 +271,13 @@
             if (startDataSnapshotName != childSnapshot.name)
             {
                 if (enumIndex == lastDataIndex) {
-                    this.lastDataSnapshot = childSnapshot;
+                    weakSelf.lastDataSnapshot = childSnapshot;
                 }
                 
                 if ([childSnapshot.value isKindOfClass:NSNull.class]) {
                     completionBlock(nil, snapshot);
                 } else {
-                    [this.dataSource collection:this prepareModelWithData:childSnapshot completion:completionBlock];
+                    [weakSelf.dataSource collection:weakSelf prepareModelWithData:childSnapshot completion:completionBlock];
                 }
             }
             
