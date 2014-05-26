@@ -52,7 +52,7 @@
 
 - (NSString *)description
 {
-    return _reference.description;
+    return self.reference.description;
 }
 
 - (void)startListeners
@@ -65,7 +65,7 @@
 
 - (void)startListeningForNew
 {
-    if (_eventHandles[@(FEventTypeChildAdded)]) return;
+    if (self.eventHandles[@(FEventTypeChildAdded)]) return;
     
     FQuery *query = nil;
     
@@ -90,30 +90,26 @@
             
             if (!model) { return; }
             
-            assert([model conformsToProtocol:@protocol(CWCollectionModelProtocol)]);
-            
-            if ([weakSelf hasModel:model])
-            {
+            if ([weakSelf hasModel:model]) {
                 [weakSelf updateModel:model silent:NO];
-            }
-            else if (!processed)
-            {
+            } else if (!processed) {
                 // If a model has already been processed, it should never be added again
                 // Otherwise, a model could have been removed in the meantime, but receive
                 // echo from prepareModelWithData:completion: as it may be still listening to somethig else
                 // TODO: it would be nice to receive a cancellable FOperation: we could cancel it from here
                 [weakSelf addModel:model];
             }
+            
             processed = YES;
         }];
     }];
     
-    _eventHandles[@(FEventTypeChildAdded)] = @(handle);
+    self.eventHandles[@(FEventTypeChildAdded)] = @(handle);
 }
 
 - (void)setupListenerForEventType:(FEventType)eventType withSelector:(SEL)selector
 {
-    if (_eventHandles[@(eventType)]) return;
+    if (self.eventHandles[@(eventType)]) return;
 
     __weak CWFirebaseCollection *weakSelf = self;
     FirebaseHandle handle;
@@ -126,7 +122,7 @@
         }
     }];
     
-    _eventHandles[@(eventType)] = @(handle);
+    self.eventHandles[@(eventType)] = @(handle);
 }
 
 - (void)removeModelWithSnapshot:(FDataSnapshot *)snapshot
