@@ -227,7 +227,7 @@
             if (!batchLoading) {
                 
                 // Query already completed, but receives new data updates.
-                // weakSelf is due to Firebase Offline cache which forces us to accept
+                // This is due to Firebase Offline cache which forces us to accept
                 // multiple completion callbacks per location (1. cache, 2. remote value).
                 // Yet, once we have received 1 callback per location, the query is
                 // considered completed (otherwise, it may never complete: e.g. if one child
@@ -245,8 +245,7 @@
                 [weakSelf.currentBatchModels setObject:model forKey:model.identifier];
             }
             
-            if (preparedSnapshots.count == totalCount)
-            {
+            if (preparedSnapshots.count == totalCount) {
                 readyBlock();
             }
         };
