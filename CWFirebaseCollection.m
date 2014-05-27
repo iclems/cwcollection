@@ -154,10 +154,10 @@
 
 - (void)runQueryWithLimit:(NSUInteger)limit completion:(void (^)(CWCollection *collection, NSArray *models))completion
 {
-    NSAssert(completion, @"A completion block is required.");
-    
     void(^errorBlock)() = ^() {
-        completion(self, @[]);
+        if (completion) {
+            completion(self, @[]);
+        }
     };
     
     if (self.isLoading || !self.hasMore) return errorBlock();
