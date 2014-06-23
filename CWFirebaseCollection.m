@@ -19,6 +19,7 @@
 @property (nonatomic, strong) NSMutableDictionary *eventHandles;
 @property (nonatomic, strong) NSMutableDictionary *currentBatchModels;
 @property (nonatomic, strong, readwrite) FDataSnapshot *lastDataSnapshot;
+@property (nonatomic, strong) FDataSnapshot *startAtSnapshot;
 
 @end
 
@@ -30,22 +31,13 @@
     {
         _reference = reference;
         _currentBatchModels = [NSMutableDictionary dictionary];
+        _eventHandles = [NSMutableDictionary dictionary];
         _isLoading = NO;
         _batchSize = 0;
         _autoStartListeners = YES;
         _hasMore = YES;
         
         self.dataSource = dataSource;
-    }
-    return self;
-}
-
-- (id)init
-{
-    if (self.reference && self.modelClass) {
-        self = [self initWithReference:self.reference dataSource:self];
-    } else {
-        self = [super init];
     }
     return self;
 }
@@ -69,20 +61,24 @@
     
     FQuery *query = nil;
     
-    if (!self.lastDataSnapshot) {
+    if (!self.startAtSnapshot) {
         query = self.reference;
     }
     else if (self.isAscending) {
-        query = [self.reference queryEndingAtPriority:self.lastDataSnapshot.priority andChildName:self.lastDataSnapshot.name];
+        query = [self.reference queryEndingAtPriority:self.startAtSnapshot.priority andChildName:self.startAtSnapshot.name];
     }
     else {
-        query = [self.reference queryStartingAtPriority:self.lastDataSnapshot.priority andChildName:self.lastDataSnapshot.name];
+        query = [self.reference queryStartingAtPriority:self.startAtSnapshot.priority andChildName:self.startAtSnapshot.name];
     }
     
     __weak CWFirebaseCollection *weakSelf = self;
     FirebaseHandle handle;
     
     handle = [query observeEventType:FEventTypeChildAdded withBlock:^(FDataSnapshot *snapshot) {
+        
+        if ([snapshot.name isEqualToString:weakSelf.startAtSnapshot.name]) {
+            return;
+        }
 
         __block BOOL processed = NO;
 
@@ -253,9 +249,10 @@
         if (!snapshot.childrenCount) {
             return completionBlock(nil, nil);
         }
-
+        
         NSUInteger enumIndex = 0;
         NSUInteger lastDataIndex = weakSelf.isAscending ? (snapshot.childrenCount - 1) : 0;
+        NSUInteger firstDataIndex = weakSelf.isAscending ? 0 : (snapshot.childrenCount - 1);
         
         // TODO: snapshot.children should be reversed if not ascending
         // But snapshot.children.allObjects.reverseEnumerator does not seem to work for now
@@ -267,6 +264,9 @@
             {
                 if (enumIndex == lastDataIndex) {
                     weakSelf.lastDataSnapshot = childSnapshot;
+                }
+                else if (enumIndex == firstDataIndex) {
+                    weakSelf.startAtSnapshot = childSnapshot;
                 }
                 
                 if ([childSnapshot.value isKindOfClass:NSNull.class]) {
