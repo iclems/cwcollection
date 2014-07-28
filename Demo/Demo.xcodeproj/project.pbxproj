@@ -25,9 +25,9 @@
 		191DAD3419094D8800CD016F /* CWFirebaseCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 191DAD3219094D8800CD016F /* CWFirebaseCollection.m */; };
 		191DAD3719094E6500CD016F /* CWDemoCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 191DAD3619094E6500CD016F /* CWDemoCollection.m */; };
 		191DAD3A19094EE800CD016F /* CWDemoModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 191DAD3919094EE800CD016F /* CWDemoModel.m */; };
-		193C1C601913E4C3000B3E1B /* CWModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 193C1C5D1913E4C3000B3E1B /* CWModel.m */; };
 		193C1C611913E4C3000B3E1B /* NSDate+JavascriptTimestamp.m in Sources */ = {isa = PBXBuildFile; fileRef = 193C1C5F1913E4C3000B3E1B /* NSDate+JavascriptTimestamp.m */; };
 		193C1C651913EA19000B3E1B /* CWDemoTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 193C1C641913EA19000B3E1B /* CWDemoTableViewCell.m */; };
+		1984929D19868EF2000C9B35 /* CWModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 1984929C19868EF2000C9B35 /* CWModel.m */; };
 		B1C42D7D230647FD83FB81D6 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1ED5A4644BDC4525B7997784 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -69,13 +69,13 @@
 		191DAD3619094E6500CD016F /* CWDemoCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CWDemoCollection.m; sourceTree = "<group>"; };
 		191DAD3819094EE800CD016F /* CWDemoModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWDemoModel.h; sourceTree = "<group>"; };
 		191DAD3919094EE800CD016F /* CWDemoModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CWDemoModel.m; sourceTree = "<group>"; };
-		193C1C5C1913E4C3000B3E1B /* CWModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CWModel.h; path = ../../../../Documents/Development/projects/lm/LiveMinutes/LiveMinutes/CWCollection/CWModel.h; sourceTree = "<group>"; };
-		193C1C5D1913E4C3000B3E1B /* CWModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CWModel.m; path = ../../../../Documents/Development/projects/lm/LiveMinutes/LiveMinutes/CWCollection/CWModel.m; sourceTree = "<group>"; };
 		193C1C5E1913E4C3000B3E1B /* NSDate+JavascriptTimestamp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSDate+JavascriptTimestamp.h"; path = "../../../../Documents/Development/projects/lm/LiveMinutes/LiveMinutes/CWCollection/NSDate+JavascriptTimestamp.h"; sourceTree = "<group>"; };
 		193C1C5F1913E4C3000B3E1B /* NSDate+JavascriptTimestamp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSDate+JavascriptTimestamp.m"; path = "../../../../Documents/Development/projects/lm/LiveMinutes/LiveMinutes/CWCollection/NSDate+JavascriptTimestamp.m"; sourceTree = "<group>"; };
 		193C1C621913E5EB000B3E1B /* CWCollectionModelProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CWCollectionModelProtocol.h; path = ../../CWCollectionModelProtocol.h; sourceTree = "<group>"; };
 		193C1C631913EA19000B3E1B /* CWDemoTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CWDemoTableViewCell.h; sourceTree = "<group>"; };
 		193C1C641913EA19000B3E1B /* CWDemoTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CWDemoTableViewCell.m; sourceTree = "<group>"; };
+		1984929B19868EF2000C9B35 /* CWModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CWModel.h; path = ../../CWModel.h; sourceTree = "<group>"; };
+		1984929C19868EF2000C9B35 /* CWModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CWModel.m; path = ../../CWModel.m; sourceTree = "<group>"; };
 		1ED5A4644BDC4525B7997784 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CEB270A9F4E48E28978A844 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -186,8 +186,8 @@
 			isa = PBXGroup;
 			children = (
 				193C1C621913E5EB000B3E1B /* CWCollectionModelProtocol.h */,
-				193C1C5C1913E4C3000B3E1B /* CWModel.h */,
-				193C1C5D1913E4C3000B3E1B /* CWModel.m */,
+				1984929B19868EF2000C9B35 /* CWModel.h */,
+				1984929C19868EF2000C9B35 /* CWModel.m */,
 				191DAD2F19094D8800CD016F /* CWCollection.h */,
 				191DAD3019094D8800CD016F /* CWCollection.m */,
 				191DAD3119094D8800CD016F /* CWFirebaseCollection.h */,
@@ -369,7 +369,7 @@
 				191DAD3719094E6500CD016F /* CWDemoCollection.m in Sources */,
 				191DAD3A19094EE800CD016F /* CWDemoModel.m in Sources */,
 				191DAD3319094D8800CD016F /* CWCollection.m in Sources */,
-				193C1C601913E4C3000B3E1B /* CWModel.m in Sources */,
+				1984929D19868EF2000C9B35 /* CWModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -6,7 +6,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "CWCollection.h"
+
+@class CWCollection;
+@protocol CWCollectionModelProtocol;
 
 @interface CWModel : NSObject <CWCollectionModelProtocol>
 

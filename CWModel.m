@@ -7,6 +7,7 @@
 
 #import <objc/runtime.h>
 
+#import "CWCollectionModelProtocol.h"
 #import "CWModel.h"
 #import "NSDate+JavascriptTimestamp.h"
 
