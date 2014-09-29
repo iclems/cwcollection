@@ -7,6 +7,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "CWCollectionModelProtocol.h"
+
 @class CWCollection;
 @protocol CWCollectionModelProtocol;
 
