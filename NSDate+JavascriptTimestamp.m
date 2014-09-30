@@ -11,9 +11,7 @@
 @implementation NSDate (JavascriptTimestamp)
 
 + (NSDate *)dateFromJavascriptTimestamp:(id)timestamp {
-
     return [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval) ([timestamp doubleValue] / 1000)];
-    
 }
 
 + (NSNumber *)javascriptTimestampNow {

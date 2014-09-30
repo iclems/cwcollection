@@ -64,6 +64,7 @@ typedef void (^CWCollectionPrepareResult)(id <CWCollectionModelProtocol> model, 
 - (id)modelAtIndex:(NSUInteger)index;
 - (NSUInteger)indexForInsertingModel:(id <CWCollectionModelProtocol>)model;
 - (void)sort;
+- (void)refilter;
 
 - (void)addModel:(id <CWCollectionModelProtocol>)model;
 - (void)addModel:(id <CWCollectionModelProtocol>)model silent:(BOOL)silent;
