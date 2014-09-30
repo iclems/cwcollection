@@ -13,6 +13,7 @@
 @interface CWCollection()
 
 @property (nonatomic, strong, readwrite) NSMutableArray *models;
+@property (nonatomic, strong, readwrite) NSArray *filteredModels;
 
 @property (nonatomic, strong) NSMutableDictionary *dictionary;
 @property (nonatomic, strong) NSComparator comparator;
@@ -26,6 +27,7 @@
     if (self = [super init]) {
         _dictionary = [NSMutableDictionary dictionary];
         _models = [NSMutableArray array];
+        _filteredModels = [NSArray array];
     }
 	return self;
 }
@@ -123,6 +125,7 @@
             NSUInteger insertIndex = [self indexForInsertingModel:model];
             [self.models insertObject:model atIndex:insertIndex];
             [self.dictionary setObject:model forKey:model.identifier];
+            [self refilter];
         
             if (!silent) {
                 [self modelAdded:model atIndex:insertIndex];
@@ -155,6 +158,7 @@
         
         [self.models removeObject:[_dictionary objectForKey:identifier]];
         [self.dictionary removeObjectForKey:identifier];
+        [self refilter];
         
         if (!silent) {
             [self modelRemoved:localModel atIndex:index];
@@ -180,6 +184,7 @@
         {
             [self modelUpdated:localModel atIndex:indexBeforeUpdate];
             [self sort];
+            [self refilter];
             
             NSUInteger indexAfterUpdate = [self indexOf:localModel];
             BOOL modelDidMove = indexBeforeUpdate != indexAfterUpdate;
@@ -223,6 +228,25 @@
     if ([self.delegate respondsToSelector:@selector(collection:modelMoved:fromIndex:toIndex:)]) {
         [self.delegate collection:self modelMoved:model fromIndex:fromIndex toIndex:toIndex];
     }
+}
+
+#pragma mark - Filter
+
+- (void)setFilter:(NSPredicate *)filter
+{
+    _filter = filter;
+    
+    [self refilter];
+}
+
+- (void)refilter
+{
+    self.filteredModels = self.filter ? [self.models filteredArrayUsingPredicate:self.filter] : nil;
+}
+
+- (NSArray *)filteredModels
+{
+    return _filteredModels ?: self.models;
 }
 
 #pragma mark - Compliance

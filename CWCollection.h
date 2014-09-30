@@ -53,10 +53,12 @@ typedef void (^CWCollectionPrepareResult)(id <CWCollectionModelProtocol> model, 
 @interface CWCollection : NSObject
 
 @property (nonatomic, strong, readonly) NSMutableArray *models;
+@property (nonatomic, strong, readonly) NSArray *filteredModels;
 
 @property (nonatomic, assign) id <CWCollectionDelegate> delegate;
 @property (nonatomic, assign) id <CWCollectionDataSource> dataSource;
 @property (nonatomic, assign) Class modelClass;
+@property (nonatomic, strong) NSPredicate *filter;
 
 - (id <CWCollectionModelProtocol>)modelWithIdentifier:(NSString *)identifier;
 - (id)modelAtIndex:(NSUInteger)index;
