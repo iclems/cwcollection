@@ -31,6 +31,9 @@
                                                 <constraint firstAttribute="width" constant="20" id="U23-ea-kWL"/>
                                                 <constraint firstAttribute="height" constant="20" id="hdG-2G-EZU"/>
                                             </constraints>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="string" keyPath="optimizelyId" value="_Main-activityIndicatorView-CwY-7j-7Hc"/>
+                                            </userDefinedRuntimeAttributes>
                                         </activityIndicatorView>
                                     </subviews>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -38,6 +41,9 @@
                                         <constraint firstAttribute="centerY" secondItem="CwY-7j-7Hc" secondAttribute="centerY" id="CBv-sH-Man"/>
                                         <constraint firstAttribute="centerX" secondItem="CwY-7j-7Hc" secondAttribute="centerX" id="uv1-n1-VSG"/>
                                     </constraints>
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="string" keyPath="optimizelyId" value="_Main-view-GIW-l0-irf"/>
+                                    </userDefinedRuntimeAttributes>
                                 </view>
                                 <prototypes>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" rowHeight="70" id="2Lq-6N-OF1" customClass="CWDemoTableViewCell">
@@ -55,6 +61,9 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <textInputTraits key="textInputTraits"/>
                                                     <dataDetectorType key="dataDetectorTypes" link="YES"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="string" keyPath="optimizelyId" value="_Main-textView-xE6-tF-5Lm"/>
+                                                    </userDefinedRuntimeAttributes>
                                                 </textView>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4dS-3V-WMe">
                                                     <rect key="frame" x="20" y="6" width="280" height="21"/>
@@ -62,6 +71,9 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                     <nil key="highlightedColor"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="string" keyPath="optimizelyId" value="_Main-label-4dS-3V-WMe"/>
+                                                    </userDefinedRuntimeAttributes>
                                                 </label>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Content Snippet" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rK6-l2-RWy">
                                                     <rect key="frame" x="20" y="25" width="280" height="21"/>
@@ -69,20 +81,32 @@
                                                     <fontDescription key="fontDescription" type="italicSystem" pointSize="14"/>
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                     <nil key="highlightedColor"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="string" keyPath="optimizelyId" value="_Main-label-rK6-l2-RWy"/>
+                                                    </userDefinedRuntimeAttributes>
                                                 </label>
                                             </subviews>
+                                            <userDefinedRuntimeAttributes>
+                                                <userDefinedRuntimeAttribute type="string" keyPath="optimizelyId" value="_Main-tableViewCellContentView-x2U-ft-wce"/>
+                                            </userDefinedRuntimeAttributes>
                                         </tableViewCellContentView>
                                         <connections>
                                             <outlet property="linkTextView" destination="xE6-tF-5Lm" id="5RS-2o-bHm"/>
                                             <outlet property="snippetLabel" destination="rK6-l2-RWy" id="1yd-mJ-cL3"/>
                                             <outlet property="titleLabel" destination="4dS-3V-WMe" id="baz-xN-rc0"/>
                                         </connections>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="optimizelyId" value="_Main-tableViewCell-2Lq-6N-OF1"/>
+                                        </userDefinedRuntimeAttributes>
                                     </tableViewCell>
                                 </prototypes>
                                 <connections>
                                     <outlet property="dataSource" destination="vXZ-lx-hvc" id="i2f-Vc-RgH"/>
                                     <outlet property="delegate" destination="vXZ-lx-hvc" id="nMk-Ej-qpx"/>
                                 </connections>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="optimizelyId" value="_Main-tableView-zoj-hn-K1n"/>
+                                </userDefinedRuntimeAttributes>
                             </tableView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -92,6 +116,9 @@
                             <constraint firstItem="zoj-hn-K1n" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" id="hwJ-nc-qqB"/>
                             <constraint firstItem="zoj-hn-K1n" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="wCO-ys-byA"/>
                         </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="string" keyPath="optimizelyId" value="_Main-view-kh9-bI-dsS"/>
+                        </userDefinedRuntimeAttributes>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <connections>
