@@ -57,6 +57,8 @@
 - (void)startListeners;
 - (void)startListeningForNew;
 
+- (void)dispose;
+
 #pragma mark - Default Model Implementation
 
 - (void)collection:(CWCollection *)collection prepareModelWithData:(FDataSnapshot *)snapshot completion:(CWCollectionPrepareResult)completionBlock;

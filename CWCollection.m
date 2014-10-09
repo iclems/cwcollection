@@ -32,6 +32,18 @@
 	return self;
 }
 
+- (void)dealloc
+{
+    for (id <CWCollectionModelProtocol> model in self.models) {
+        if (model.collection == self) {
+            model.collection = nil;
+        }
+    }
+    
+    _delegate = nil;
+    _dataSource = nil;
+}
+
 #pragma mark - Sort
 
 /** 

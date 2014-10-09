@@ -17,6 +17,7 @@
 @property (nonatomic, assign, readwrite) BOOL hasMore;
 
 @property (nonatomic, strong) NSMutableDictionary *eventHandles;
+@property (nonatomic, strong) NSMutableArray *observersRemovalBlocks;
 @property (nonatomic, strong) NSMutableDictionary *currentBatchModels;
 @property (nonatomic, strong, readwrite) FDataSnapshot *lastDataSnapshot;
 @property (nonatomic, strong) FDataSnapshot *startAtSnapshot;
@@ -32,6 +33,7 @@
         _reference = reference;
         _currentBatchModels = [NSMutableDictionary dictionary];
         _eventHandles = [NSMutableDictionary dictionary];
+        _observersRemovalBlocks = [NSMutableArray array];
         _isLoading = NO;
         _batchSize = 0;
         _autoStartListeners = YES;
@@ -40,6 +42,20 @@
         self.dataSource = dataSource;
     }
     return self;
+}
+
+- (void)dealloc
+{
+    [self dispose];
+}
+
+- (void)dispose
+{
+    for (NSBlockOperation *operation in self.observersRemovalBlocks) {
+        [operation start];
+    }
+    
+    [self.observersRemovalBlocks removeAllObjects];
 }
 
 - (NSString *)description
@@ -58,7 +74,7 @@
 - (void)startListeningForNew
 {
     if (self.eventHandles[@(FEventTypeChildAdded)]) return;
-    
+
     FQuery *query = nil;
     
     if (!self.startAtSnapshot) {
@@ -101,6 +117,10 @@
     }];
     
     self.eventHandles[@(FEventTypeChildAdded)] = @(handle);
+    
+    [self.observersRemovalBlocks addObject:[NSBlockOperation blockOperationWithBlock:^{
+        [query removeObserverWithHandle:handle];
+    }]];
 }
 
 - (void)setupListenerForEventType:(FEventType)eventType withSelector:(SEL)selector
@@ -119,6 +139,9 @@
     }];
     
     self.eventHandles[@(eventType)] = @(handle);
+    [self.observersRemovalBlocks addObject:[NSBlockOperation blockOperationWithBlock:^{
+        [weakSelf.reference removeObserverWithHandle:handle];
+    }]];
 }
 
 - (void)removeModelWithSnapshot:(FDataSnapshot *)snapshot
