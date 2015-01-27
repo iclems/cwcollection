@@ -15,25 +15,25 @@
 @property (nonatomic, strong, readwrite) Firebase* reference;
 @property (nonatomic, assign, readwrite) BOOL isLoading;
 @property (nonatomic, assign, readwrite) BOOL hasMore;
+@property (nonatomic, assign) BOOL isListeningNewChildren;
 
-@property (nonatomic, strong) NSMutableDictionary *eventHandles;
-@property (nonatomic, strong) NSMutableArray *observersRemovalBlocks;
 @property (nonatomic, strong) NSMutableDictionary *currentBatchModels;
 @property (nonatomic, strong, readwrite) FDataSnapshot *lastDataSnapshot;
 @property (nonatomic, strong) FDataSnapshot *startAtSnapshot;
+@property (nonatomic, strong) NSOperationQueue *observersCancelQueue;
 
 @end
 
 @implementation CWFirebaseCollection
 
-- (id)initWithReference:(Firebase *)reference dataSource:(id <CWCollectionDataSource>)dataSource
+- (id)initWithReference:(Firebase *)reference dataSource:(id <CWFirebaseCollectionDataSource>)dataSource
 {
     if (self = [super init])
     {
         _reference = reference;
         _currentBatchModels = [NSMutableDictionary dictionary];
-        _eventHandles = [NSMutableDictionary dictionary];
-        _observersRemovalBlocks = [NSMutableArray array];
+        _observersCancelQueue = [[NSOperationQueue alloc] init];
+        _observersCancelQueue.suspended = YES;
         _isLoading = NO;
         _batchSize = 0;
         _autoStartListeners = YES;
@@ -44,6 +44,11 @@
     return self;
 }
 
+- (id)copy
+{
+    return [[[self class] alloc] initWithReference:self.reference dataSource:self.dataSource];;
+}
+
 - (void)dealloc
 {
     [self dispose];
@@ -51,11 +56,7 @@
 
 - (void)dispose
 {
-    for (NSBlockOperation *operation in self.observersRemovalBlocks) {
-        [operation start];
-    }
-    
-    [self.observersRemovalBlocks removeAllObjects];
+    self.observersCancelQueue.suspended = NO;
 }
 
 - (NSString *)description
@@ -63,17 +64,19 @@
     return self.reference.description;
 }
 
-- (void)startListeners
+- (void)startListenersWithQuery:(FQuery *)query
 {
-    [self startListeningForNew];
-    [self setupListenerForEventType:FEventTypeChildChanged withSelector:@selector(remoteModelDidChangeWithSnapshot:)];
-    [self setupListenerForEventType:FEventTypeChildMoved withSelector:@selector(remoteModelDidChangeWithSnapshot:)];
-    [self setupListenerForEventType:FEventTypeChildRemoved withSelector:@selector(removeModelWithSnapshot:)];
+    [self listenNewChildren];
+    
+    [self setupListenerWithQuery:query eventType:FEventTypeChildChanged selector:@selector(remoteModelDidChangeWithSnapshot:)];
+    [self setupListenerWithQuery:query eventType:FEventTypeChildMoved selector:@selector(remoteModelDidChangeWithSnapshot:)];
+    [self setupListenerWithQuery:query eventType:FEventTypeChildRemoved selector:@selector(removeModelWithSnapshot:)];
 }
 
-- (void)startListeningForNew
+- (void)listenNewChildren
 {
-    if (self.eventHandles[@(FEventTypeChildAdded)]) return;
+    if (self.isListeningNewChildren) { return; }
+    else { self.isListeningNewChildren = YES; }
 
     FQuery *query = nil;
     
@@ -116,21 +119,17 @@
         }];
     }];
     
-    self.eventHandles[@(FEventTypeChildAdded)] = @(handle);
-    
-    [self.observersRemovalBlocks addObject:[NSBlockOperation blockOperationWithBlock:^{
+    [self.observersCancelQueue addOperationWithBlock:^{
         [query removeObserverWithHandle:handle];
-    }]];
+    }];
 }
 
-- (void)setupListenerForEventType:(FEventType)eventType withSelector:(SEL)selector
+- (void)setupListenerWithQuery:(FQuery *)query eventType:(FEventType)eventType selector:(SEL)selector
 {
-    if (self.eventHandles[@(eventType)]) return;
-
     __weak CWFirebaseCollection *weakSelf = self;
     FirebaseHandle handle;
     
-    handle = [self.reference observeEventType:eventType withBlock:^(FDataSnapshot *snapshot) {
+    handle = [query observeEventType:eventType withBlock:^(FDataSnapshot *snapshot) {
         if ([weakSelf respondsToSelector:selector]) {
             IMP imp = class_getMethodImplementation(weakSelf.class, selector);
             void (*func)(id, SEL, FDataSnapshot *) = (void *)imp;
@@ -138,10 +137,9 @@
         }
     }];
     
-    self.eventHandles[@(eventType)] = @(handle);
-    [self.observersRemovalBlocks addObject:[NSBlockOperation blockOperationWithBlock:^{
-        [weakSelf.reference removeObserverWithHandle:handle];
-    }]];
+    [self.observersCancelQueue addOperationWithBlock:^{
+        [query removeObserverWithHandle:handle];
+    }];
 }
 
 - (void)removeModelWithSnapshot:(FDataSnapshot *)snapshot
@@ -159,6 +157,11 @@
         }
     }];
 
+}
+
+- (void)listen
+{
+    [self loadAllWithCompletion:nil];
 }
 
 - (void)loadAllWithCompletion:(void (^)(CWCollection *collection, NSArray *models))completion
@@ -179,8 +182,8 @@
         }
     };
     
-    if (self.isLoading || !self.hasMore) return errorBlock();
-    else self.isLoading = YES;
+    if (self.isLoading || !self.hasMore) { return errorBlock(); }
+    else { self.isLoading = YES; }
     
     [self.currentBatchModels  removeAllObjects];
     
@@ -225,7 +228,7 @@
                 completion(weakSelf, weakSelf.currentBatchModels.allValues);
             }
             
-            [weakSelf startListeners];
+            [weakSelf startListenersWithQuery:query];
             
             [weakSelf.currentBatchModels removeAllObjects];
             preparedSnapshots = nil;
@@ -360,7 +363,7 @@
         [modelRef setValue:model.dictionary];
     }
     
-    return [super addModel:model silent:NO];
+    return [self addModel:model silent:NO];
 }
 
 @end

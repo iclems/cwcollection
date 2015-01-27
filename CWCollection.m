@@ -35,7 +35,7 @@
 - (void)dealloc
 {
     for (id <CWCollectionModelProtocol> model in self.models) {
-        if (model.collection == self) {
+        if ([model respondsToSelector:@selector(collection)] && model.collection == self) {
             model.collection = nil;
         }
     }
