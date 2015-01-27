@@ -462,45 +462,45 @@ static BOOL _needsChineseFontCascadeFix = NO;
 		return YES;
 	}
 	
-	CTFontRef tmpFont = [self newMatchingFont];
-	
 	BOOL smallCapsSupported = NO;
 	
-	// check if this font supports small caps
-	CFArrayRef fontFeatures = CTFontCopyFeatures(tmpFont);
-	
-	if (fontFeatures)
-	{
-		for (NSDictionary *oneFeature in (__bridge NSArray *)fontFeatures)
-		{
-			NSInteger featureTypeIdentifier = [[oneFeature objectForKey:(id)kCTFontFeatureTypeIdentifierKey] integerValue];
-			
-			if (featureTypeIdentifier == 3) // Letter Case
-			{
-				NSArray *featureSelectors = [oneFeature objectForKey:(id)kCTFontFeatureTypeSelectorsKey];
-				
-				for (NSDictionary *oneFeatureSelector in featureSelectors)
-				{
-					NSInteger featureSelectorIdentifier = [[oneFeatureSelector objectForKey:(id)kCTFontFeatureSelectorIdentifierKey] integerValue];
-					
-					if (featureSelectorIdentifier == 3) // Small Caps
-					{
-						// hooray, small caps supported!
-						smallCapsSupported = YES;
-						
-						break;
-					}
-				}
-				
-				break;
-			}
-		}
-		
-		CFRelease(fontFeatures);
-	}
+	CTFontRef tmpFont = [self newMatchingFont];
 	
 	if (tmpFont)
 	{
+		// check if this font supports small caps
+		CFArrayRef fontFeatures = CTFontCopyFeatures(tmpFont);
+		
+		if (fontFeatures)
+		{
+			for (NSDictionary *oneFeature in (__bridge NSArray *)fontFeatures)
+			{
+				NSInteger featureTypeIdentifier = [[oneFeature objectForKey:(id)kCTFontFeatureTypeIdentifierKey] integerValue];
+				
+				if (featureTypeIdentifier == 3) // Letter Case
+				{
+					NSArray *featureSelectors = [oneFeature objectForKey:(id)kCTFontFeatureTypeSelectorsKey];
+					
+					for (NSDictionary *oneFeatureSelector in featureSelectors)
+					{
+						NSInteger featureSelectorIdentifier = [[oneFeatureSelector objectForKey:(id)kCTFontFeatureSelectorIdentifierKey] integerValue];
+						
+						if (featureSelectorIdentifier == 3) // Small Caps
+						{
+							// hooray, small caps supported!
+							smallCapsSupported = YES;
+							
+							break;
+						}
+					}
+					
+					break;
+				}
+			}
+			
+			CFRelease(fontFeatures);
+		}
+	
 		CFRelease(tmpFont);
 	}
 	
@@ -545,7 +545,7 @@ static BOOL _needsChineseFontCascadeFix = NO;
 	// check the override table that has all preinstalled fonts plus the ones the user registered
 	NSString *overrideName = nil;
 	
-	if (_fontFamily)
+	if (_fontFamily && !_fontName) // forced font name takes precedence
 	{
 		if (_smallCapsFeature)
 		{
@@ -766,10 +766,6 @@ static BOOL _needsChineseFontCascadeFix = NO;
 {
 	DTCoreTextFontDescriptor *newDesc = [[DTCoreTextFontDescriptor allocWithZone:zone] initWithFontAttributes:[self fontAttributes]];
 	newDesc.pointSize = self.pointSize;
-	if (_stylisticClass)
-	{
-		newDesc.stylisticClass = self.stylisticClass;
-	}
 	
 	return newDesc;
 }
@@ -999,7 +995,7 @@ static BOOL _needsChineseFontCascadeFix = NO;
 @synthesize fontName = _fontName;
 @synthesize pointSize = _pointSize;
 
-@synthesize symbolicTraits;
+@dynamic symbolicTraits;
 
 @synthesize stylisticClass = _stylisticClass;
 @synthesize smallCapsFeature = _smallCapsFeature;

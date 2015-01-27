@@ -624,7 +624,14 @@
 			DTTextAttachment *attachment = [attributes objectForKey:NSAttachmentAttributeName];
 
 			if ([plainSubString isEqualToString:UNICODE_OBJECT_PLACEHOLDER]) {
-				attachment = [attributes objectForKey:@"NSAttachment"];
+				
+				// if there was no old-style attachment let's try new NS-style.
+				if (!attachment)
+				{
+					attachment = [attributes objectForKey:@"NSAttachment"];
+				}
+				
+				// we don't want to output the placeholder character in any case
 				subString = @"";
 			}
 			
@@ -1000,5 +1007,6 @@
 
 @synthesize attributedString = _attributedString;
 @synthesize textScale = _textScale;
+@synthesize useAppleConvertedSpace = _useAppleConvertedSpace;
 
 @end

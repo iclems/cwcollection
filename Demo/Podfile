@@ -1,4 +1,4 @@
 platform :ios, '6.0'
-pod 'Firebase'
+pod 'Firebase', '~> 1.2.3'
 pod 'Block-KVO'
 pod 'DTCoreText'

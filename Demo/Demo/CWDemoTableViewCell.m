@@ -14,19 +14,22 @@
 
 @implementation CWDemoTableViewCell
 
-- (void)awakeFromNib
+// TODO: Change for FBKVOController
+
+- (void)prepareForReuse
 {
-    // Initialization code
+    [super prepareForReuse];
+    [self removeAllObservations];
 }
 
 - (void)setModel:(CWDemoModel *)model
 {
     assert(model);
 
-    _model = model;
-    
     [self removeAllObservations];
 
+    _model = model;
+    
     __weak CWDemoTableViewCell *weakSelf = self;
     
     [self map:@keypath(self.model.title) to:@keypath(self.titleLabel.attributedText) transform:^id(NSString *value) {
@@ -38,13 +41,6 @@
     }];
 
     [self map:@keypath(self.model.url) to:@keypath(self.linkTextView.text) null:@"No Link"];
-}
-
-- (void)prepareForReuse
-{
-    [super prepareForReuse];
-    
-    [self removeAllObservations];
 }
 
 - (NSAttributedString *)attributedStringFromHTMLString:(NSString *)html

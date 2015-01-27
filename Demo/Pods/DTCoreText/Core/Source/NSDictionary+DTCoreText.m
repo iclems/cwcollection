@@ -84,7 +84,15 @@
 
 - (BOOL)hasAttachment
 {
-	return [self objectForKey:NSAttachmentAttributeName]!=nil;
+	id attachment = [self objectForKey:NSAttachmentAttributeName];
+	
+	if (!attachment)
+	{
+		// could also be modern NS-style attachment
+		attachment = [self objectForKey:@"NSAttachment"];
+	}
+	
+	return attachment!=nil;
 }
 
 - (DTCoreTextParagraphStyle *)paragraphStyle
@@ -113,6 +121,8 @@
 {
 	CTFontRef ctFont = (__bridge CTFontRef)[self objectForKey:(id)kCTFontAttributeName];
 	
+	// on Mac NSFont and CTFont are toll-free bridged, so this works there as well
+	
 	if (ctFont)
 	{
 		return [DTCoreTextFontDescriptor fontDescriptorForCTFont:ctFont];
@@ -139,8 +149,6 @@
 			
 			return fontDescriptor;
 		}
-#else
-#warning Creating an NSFont in modern style for Mac not implemented yet
 #endif
 	}
 	

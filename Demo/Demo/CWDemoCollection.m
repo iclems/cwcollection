@@ -18,7 +18,7 @@
     if (self = [super initWithReference:reference dataSource:self])
     {
         self.batchSize = 17;
-        self.modelClass = CWDemoModel.class;
+        self.modelClass = [CWDemoModel class];
     }
     
     return self;

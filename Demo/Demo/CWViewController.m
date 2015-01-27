@@ -46,7 +46,7 @@
     __weak CWViewController *this = self;
     
     [self.collection loadMoreWithCompletion:^(CWCollection *collection, NSArray *models) {
-        if (!models.count) return;
+        if (!models.count) { return; }
         [UIView setAnimationsEnabled:animated];
         [this.tableView insertRowsAtIndexPaths:[this indexPathsWithModels:models] withRowAnimation:UITableViewRowAnimationAutomatic];
         [UIView setAnimationsEnabled:YES];

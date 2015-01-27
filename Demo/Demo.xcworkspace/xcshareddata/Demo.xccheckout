@@ -12,7 +12,9 @@
 	<dict>
 		<key>19D62EAF-0968-4932-872B-E8331C32C21E</key>
 		<string>ssh://github.com/iclems/cwcollection.git</string>
-		<key>274BCEA4-BEE0-43B9-8CAC-E76F1BBEE473</key>
+		<key>779427A7C04973693D66DCB8D1718E089CE977D8</key>
+		<string>github.com:LiveMinutes/LiveMinutes-iOS.git</string>
+		<key>B6566967F17B4DC1D5F18B43BC3EDD95FBAD72AB</key>
 		<string>ssh://github.com/iclems/cwcollection.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
@@ -20,23 +22,33 @@
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>19D62EAF-0968-4932-872B-E8331C32C21E</key>
-		<string>../../../../Documents/Development/projects/lm/LiveMinutes/LiveMinutes/CWCollection</string>
-		<key>274BCEA4-BEE0-43B9-8CAC-E76F1BBEE473</key>
+		<string>../../../Documents/Development/projects/lm/LiveMinutes/LiveMinutes/CWCollection</string>
+		<key>779427A7C04973693D66DCB8D1718E089CE977D8</key>
+		<string>../../../..</string>
+		<key>B6566967F17B4DC1D5F18B43BC3EDD95FBAD72AB</key>
 		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>ssh://github.com/iclems/cwcollection.git</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>274BCEA4-BEE0-43B9-8CAC-E76F1BBEE473</string>
+	<string>B6566967F17B4DC1D5F18B43BC3EDD95FBAD72AB</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>274BCEA4-BEE0-43B9-8CAC-E76F1BBEE473</string>
+			<string>779427A7C04973693D66DCB8D1718E089CE977D8</string>
+			<key>IDESourceControlWCCName</key>
+			<string>..</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>B6566967F17B4DC1D5F18B43BC3EDD95FBAD72AB</string>
 			<key>IDESourceControlWCCName</key>
 			<string>cwcollection</string>
 		</dict>
