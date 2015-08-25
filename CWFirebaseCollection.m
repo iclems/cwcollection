@@ -26,6 +26,8 @@
 
 @implementation CWFirebaseCollection
 
+@dynamic dataSource, delegate;
+
 - (id)initWithReference:(Firebase *)reference dataSource:(id <CWFirebaseCollectionDataSource>)dataSource
 {
     if (self = [super init])
@@ -84,10 +86,10 @@
         query = self.reference;
     }
     else if (self.isAscending) {
-        query = [self.reference queryEndingAtPriority:self.startAtSnapshot.priority andChildName:self.startAtSnapshot.name];
+        query = [[self.reference queryOrderedByPriority] queryEndingAtValue:self.startAtSnapshot.priority childKey:self.startAtSnapshot.key];
     }
     else {
-        query = [self.reference queryStartingAtPriority:self.startAtSnapshot.priority andChildName:self.startAtSnapshot.name];
+        query = [[self.reference queryOrderedByPriority] queryStartingAtValue:self.startAtSnapshot.priority childKey:self.startAtSnapshot.key];
     }
     
     __weak CWFirebaseCollection *weakSelf = self;
@@ -95,7 +97,7 @@
     
     handle = [query observeEventType:FEventTypeChildAdded withBlock:^(FDataSnapshot *snapshot) {
         
-        if ([snapshot.name isEqualToString:weakSelf.startAtSnapshot.name]) {
+        if ([snapshot.key isEqualToString:weakSelf.startAtSnapshot.key]) {
             return;
         }
 
@@ -144,7 +146,7 @@
 
 - (void)removeModelWithSnapshot:(FDataSnapshot *)snapshot
 {
-    [self removeModelWithIdentifier:snapshot.name];
+    [self removeModelWithIdentifier:snapshot.key];
 }
 
 - (void)remoteModelDidChangeWithSnapshot:(FDataSnapshot *)snapshot
@@ -187,16 +189,18 @@
     
     [self.currentBatchModels  removeAllObjects];
     
-    FQuery *query = limit ? [self.reference queryLimitedToNumberOfChildren:limit] : self.reference;
-    
+    FQuery *query = self.reference;
     NSString *startDataSnapshotName = nil;
+
+    if (limit) {
+        query = self.isAscending ? [query queryLimitedToFirst:limit] : [query queryLimitedToLast:limit];
+    }
     
     if (self.lastDataSnapshot)
     {
-        query = [query queryEndingAtPriority:self.lastDataSnapshot.priority
-                                andChildName:self.lastDataSnapshot.name];
+        query = [[query queryOrderedByPriority] queryEndingAtValue:self.lastDataSnapshot.priority childKey:self.lastDataSnapshot.key];
         
-        startDataSnapshotName = self.lastDataSnapshot.name;
+        startDataSnapshotName = self.lastDataSnapshot.key;
     }
     
     __weak CWFirebaseCollection *weakSelf = self;
@@ -259,8 +263,8 @@
             }
             
             if (snapshot) {
-                if (preparedSnapshots[snapshot.name]) return;
-                else [preparedSnapshots setObject:@(YES) forKey:snapshot.name];
+                if (preparedSnapshots[snapshot.key]) return;
+                else [preparedSnapshots setObject:@(YES) forKey:snapshot.key];
             }
             
             if (model) {
@@ -286,7 +290,7 @@
         
         for (FDataSnapshot *childSnapshot in snapshot.children) {
             
-            if (startDataSnapshotName != childSnapshot.name)
+            if (startDataSnapshotName != childSnapshot.key)
             {
                 if (enumIndex == lastDataIndex) {
                     weakSelf.lastDataSnapshot = childSnapshot;
@@ -345,7 +349,7 @@
 
         Class class = self.modelClass;
         
-        model = [[class alloc] initWithIdentifier:snapshot.name];
+        model = [[class alloc] initWithIdentifier:snapshot.key];
         [model updateWithDictionary:snapshot.valueInExportFormat];
         
     }
@@ -359,7 +363,7 @@
 {
     if (!model.identifier) {
         Firebase *modelRef = [self.reference childByAutoId];
-        model.identifier = modelRef.name;
+        model.identifier = modelRef.key;
         [modelRef setValue:model.dictionary];
     }
     

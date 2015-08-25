@@ -46,21 +46,28 @@
 
 #pragma mark - Sort
 
-/** 
+
+- (NSComparisonResult)sortCompareModel:(id<CWCollectionModelProtocol>)model1 withModel:(id<CWCollectionModelProtocol>)model2
+{
+    if (self.dataSource && [self.dataSource respondsToSelector:@selector(collection:sortCompareModel:withModel:)]) {
+        return [self.dataSource collection:self sortCompareModel:model1 withModel:model2];
+    } else {
+        return self.isAscending ? [model1.identifier compare:model2.identifier] : [model2.identifier compare:model1.identifier];
+    }
+}
+
+/**
  * Sort
- * Performs a full resort of the collection. Never called internally. Beware, the delegate won't be called with model 
+ * Performs a full resort of the collection. Never called internally. Beware, the delegate won't be called with model
  **/
 
 - (void)sort
 {
-    if (self.dataSource && [self.dataSource respondsToSelector:@selector(collection:sortCompareModel:withModel:)])
-    {
-        __weak CWCollection *weakSelf = self;
-        
-        [self.models sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-            return [weakSelf.dataSource collection:weakSelf sortCompareModel:obj1 withModel:obj2];
-        }];
-    }
+    __weak CWCollection *weakSelf = self;
+    
+    [self.models sortUsingComparator:^NSComparisonResult(id <CWCollectionModelProtocol> obj1, id <CWCollectionModelProtocol> obj2) {
+        return [weakSelf sortCompareModel:obj1 withModel:obj2];
+    }];
 }
 
 /**
@@ -69,28 +76,22 @@
 
 - (NSUInteger)indexForInsertingModel:(id <CWCollectionModelProtocol>)model
 {
-    NSUInteger topIndex = self.models.count;
+    // Inspired from: http://www.jayway.com/2009/03/28/adding-sorted-inserts-to-uimutablearray/
 
-    if (self.dataSource && [self.dataSource respondsToSelector:@selector(collection:sortCompareModel:withModel:)])
-    {
-        // Inspired from: http://www.jayway.com/2009/03/28/adding-sorted-inserts-to-uimutablearray/
-        
-        NSUInteger index = 0;
-        
-        while (index < topIndex) {
-            NSUInteger midIndex = (index + topIndex) / 2;
-            id <CWCollectionModelProtocol> testModel = [self.models objectAtIndex:midIndex];
-            if ([self.dataSource collection:self sortCompareModel:model withModel:testModel] > 0) {
-                index = midIndex + 1;
-            } else {
-                topIndex = midIndex;
-            }
-        }
-        
-        return index;
-    }
+    NSUInteger topIndex = self.models.count;
+    NSUInteger index = 0;
     
-    return topIndex;
+    while (index < topIndex) {
+        NSUInteger midIndex = (index + topIndex) / 2;
+        id <CWCollectionModelProtocol> testModel = [self.models objectAtIndex:midIndex];
+        if ([self sortCompareModel:model withModel:testModel] > 0) {
+            index = midIndex + 1;
+        } else {
+            topIndex = midIndex;
+        }
+    }
+
+    return index;
 }
 
 #pragma mark - Accessors
@@ -219,6 +220,7 @@
     if ([self.delegate respondsToSelector:@selector(collection:modelAdded:atIndex:)]) {
         [self.delegate collection:self modelAdded:model atIndex:index];
     }
+    [self collectionDidChange];
 }
 
 - (void)modelRemoved:(id <CWCollectionModelProtocol>)model atIndex:(NSUInteger)index
@@ -226,6 +228,7 @@
     if ([self.delegate respondsToSelector:@selector(collection:modelRemoved:atIndex:)]) {
         [self.delegate collection:self modelRemoved:model atIndex:index];
     }
+    [self collectionDidChange];
 }
 
 - (void)modelUpdated:(id <CWCollectionModelProtocol>)model atIndex:(NSUInteger)index
@@ -233,12 +236,23 @@
     if ([self.delegate respondsToSelector:@selector(collection:modelUpdated:atIndex:)]) {
         [self.delegate collection:self modelUpdated:model atIndex:index];
     }
+    [self collectionDidChange];
 }
 
 - (void)modelMoved:(id <CWCollectionModelProtocol>)model fromIndex:(NSUInteger)fromIndex toIndex:(NSUInteger)toIndex
 {
     if ([self.delegate respondsToSelector:@selector(collection:modelMoved:fromIndex:toIndex:)]) {
         [self.delegate collection:self modelMoved:model fromIndex:fromIndex toIndex:toIndex];
+    }
+    [self collectionDidChange];
+}
+
+- (void)collectionDidChange
+{
+    if ([self.delegate respondsToSelector:@selector(collectionDidChange:)]) {
+        id delegate = self.delegate;
+        [NSObject cancelPreviousPerformRequestsWithTarget:delegate selector:@selector(collectionDidChange:) object:self];
+        [delegate performSelector:@selector(collectionDidChange:) withObject:self afterDelay:0.01];
     }
 }
 

@@ -1,7 +1,6 @@
-FRAMEWORK_SEARCH_PATHS = "$(PODS_ROOT)/Firebase"
+FRAMEWORK_SEARCH_PATHS = "$(PODS_ROOT)/Firebase" "$(PODS_ROOT)/Firebase"
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
-HEADER_SEARCH_PATHS = "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/Block-KVO" "${PODS_ROOT}/Headers/Public/DTCoreText" "${PODS_ROOT}/Headers/Public/DTFoundation" "${PODS_ROOT}/Headers/Public/Firebase" "$(SDKROOT)/usr/include/libxml2"
-OTHER_CFLAGS = $(inherited) -isystem "${PODS_ROOT}/Headers/Public" -isystem "${PODS_ROOT}/Headers/Public/Block-KVO" -isystem "${PODS_ROOT}/Headers/Public/DTCoreText" -isystem "${PODS_ROOT}/Headers/Public/DTFoundation" -isystem "${PODS_ROOT}/Headers/Public/Firebase"
-OTHER_LDFLAGS = -ObjC -l"Pods-Block-KVO" -l"Pods-DTCoreText" -l"Pods-DTFoundation" -l"Pods-Firebase" -l"c++" -l"icucore" -l"xml2" -framework "CFNetwork" -framework "CoreGraphics" -framework "CoreText" -framework "Firebase" -framework "ImageIO" -framework "MediaPlayer" -framework "QuartzCore" -framework "Security" -framework "SystemConfiguration"
-OTHER_LIBTOOLFLAGS = $(OTHER_LDFLAGS)
+HEADER_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/Firebase" "${PODS_ROOT}/Headers/Public/KVOController"
+OTHER_CFLAGS = $(inherited) -isystem "${PODS_ROOT}/Headers/Public" -isystem "${PODS_ROOT}/Headers/Public/Firebase" -isystem "${PODS_ROOT}/Headers/Public/KVOController"
+OTHER_LDFLAGS = $(inherited) -ObjC -l"KVOController" -l"c++" -l"icucore" -framework "CFNetwork" -framework "Firebase" -framework "Security" -framework "SystemConfiguration"
 PODS_ROOT = ${SRCROOT}/Pods

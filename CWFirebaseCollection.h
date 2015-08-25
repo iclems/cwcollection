@@ -47,7 +47,6 @@
 @property (nonatomic, assign) id <CWFirebaseCollectionDelegate> delegate;
 
 @property (nonatomic, assign) NSUInteger batchSize;
-@property (nonatomic, assign) BOOL isAscending;
 @property (nonatomic, assign) BOOL autoStartListeners;
 @property (nonatomic, assign, readonly) BOOL hasMore;
 

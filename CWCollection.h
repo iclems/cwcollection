@@ -43,6 +43,7 @@ typedef void (^CWCollectionPrepareResult)(id <CWCollectionModelProtocol> model, 
 
 - (void)collectionDidStartLoad:(CWCollection *)collection;
 - (void)collectionDidEndLoad:(CWCollection *)collection;
+- (void)collectionDidChange:(CWCollection *)collection;
 
 @end
 
@@ -59,6 +60,7 @@ typedef void (^CWCollectionPrepareResult)(id <CWCollectionModelProtocol> model, 
 @property (nonatomic, assign) id <CWCollectionDataSource> dataSource;
 @property (nonatomic, assign) Class modelClass;
 @property (nonatomic, strong) NSPredicate *filter;
+@property (nonatomic, assign) BOOL isAscending;
 
 - (id <CWCollectionModelProtocol>)modelWithIdentifier:(NSString *)identifier;
 - (id)modelAtIndex:(NSUInteger)index;

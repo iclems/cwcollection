@@ -6,52 +6,48 @@
 //  Copyright (c) 2014 Clement Wehrung. All rights reserved.
 //
 
-#import <Block-KVO/MTKObserving.h>
-#import <DTCoreText/DTCoreText.h>
+#import <KVOController/FBKVOController.h>
 
 #import "CWDemoTableViewCell.h"
 #import "CWDemoModel.h"
 
 @implementation CWDemoTableViewCell
 
-// TODO: Change for FBKVOController
-
 - (void)prepareForReuse
 {
     [super prepareForReuse];
-    [self removeAllObservations];
+    [self.KVOController unobserveAll];
 }
 
 - (void)setModel:(CWDemoModel *)model
 {
     assert(model);
 
-    [self removeAllObservations];
+    [self.KVOController unobserveAll];
 
     _model = model;
     
-    __weak CWDemoTableViewCell *weakSelf = self;
-    
-    [self map:@keypath(self.model.title) to:@keypath(self.titleLabel.attributedText) transform:^id(NSString *value) {
-        return [weakSelf attributedStringFromHTMLString:value];
-    }];
-    
-    [self map:@keypath(self.model.contentSnippet) to:@keypath(self.snippetLabel.attributedText) transform:^id(NSString *value) {
-        return [weakSelf attributedStringFromHTMLString:value];
-    }];
+    [self.KVOController observe:self.model
+                        keyPaths:@[@"title", @"text"]
+                        options:NSKeyValueObservingOptionInitial|NSKeyValueObservingOptionNew
+                          block:^(typeof(self) weakSelf, CWDemoModel *item, NSDictionary *change) {
+                              weakSelf.titleLabel.text = item.title ?: item.text;
+                          }];
 
-    [self map:@keypath(self.model.url) to:@keypath(self.linkTextView.text) null:@"No Link"];
-}
+    [self.KVOController observe:self.model
+                        keyPath:@"score"
+                        options:NSKeyValueObservingOptionInitial|NSKeyValueObservingOptionNew
+                          block:^(typeof(self) weakSelf, CWDemoModel *item, NSDictionary *change) {
+                              weakSelf.snippetLabel.text = [NSString stringWithFormat:@"%@ - %@", item.score ?: @"0", item.by];
+                          }];
 
-- (NSAttributedString *)attributedStringFromHTMLString:(NSString *)html
-{
-    NSDictionary *options = @{ DTUseiOS6Attributes: @YES, DTAttachmentParagraphSpacingAttribute: @(0) };
-    NSData *data = [html dataUsingEncoding:NSUTF8StringEncoding];
-    NSAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithHTMLData:data
-                                                                                       options:options
-                                                                            documentAttributes:nil];
-    
-    return attributedString;
+    [self.KVOController observe:self.model
+                        keyPath:@"url"
+                        options:NSKeyValueObservingOptionInitial|NSKeyValueObservingOptionNew
+                          block:^(typeof(self) weakSelf, id object, NSDictionary *change) {
+                              NSString *url = change[NSKeyValueChangeNewKey];
+                              weakSelf.linkTextView.text = [url isKindOfClass:[NSNull class]] ? @"No Link" : url;
+                          }];
 }
 
 @end

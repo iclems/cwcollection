@@ -11,15 +11,17 @@
 @implementation CWDemoModel
 
 /**
- * managedProperties declares the properties which should be automatically synced:
- * @{ localPropertyName: remotePropertyName }
+ * managedProperties declares the properties which should be automatically synced: @{ localPropertyName: remotePropertyName }
+ * @discussion: CWModel does not automatically convert a property to its local equivalent if not specified.
+ * Otherwise, security and unstability issues may arise when the data evolves.
  */
 
 - (NSDictionary *)managedProperties
 {
-    return @{ @"contentSnippet": @"contentSnippet",
-              @"link": @"link",
+    return @{ @"score": @"score",
+              @"by": @"by",
               @"title": @"title",
+              @"text": @"text",
               @"url": @"url"
             };
 }

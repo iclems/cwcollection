@@ -10,8 +10,6 @@
 #import "CWDemoModel.h"
 #import "CWDemoTableViewCell.h"
 
-#import <Block-KVO/MTKObserving.h>
-
 @interface CWViewController ()
 
 @property (nonatomic, strong) CWDemoCollection *collection;
@@ -111,8 +109,7 @@
 
 - (void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    CWDemoModel *model = [_collection.models objectAtIndex:indexPath.row];
-    [model removeAllObservations];
+    [cell prepareForReuse];
 }
 
 #pragma mark - Index Helpers

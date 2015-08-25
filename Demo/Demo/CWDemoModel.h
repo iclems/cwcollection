@@ -13,9 +13,10 @@
 
 @interface CWDemoModel : CWModel
 
-@property (nonatomic, strong) NSString *contentSnippet;
-@property (nonatomic, strong) NSString *link;
+@property (nonatomic, strong) NSString *score;
+@property (nonatomic, strong) NSString *by;
 @property (nonatomic, strong) NSString *title;
+@property (nonatomic, strong) NSString *text;
 @property (nonatomic, strong) NSString *url;
 
 @end
