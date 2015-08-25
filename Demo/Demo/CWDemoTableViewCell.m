@@ -38,7 +38,7 @@
                         keyPath:@"score"
                         options:NSKeyValueObservingOptionInitial|NSKeyValueObservingOptionNew
                           block:^(typeof(self) weakSelf, CWDemoModel *item, NSDictionary *change) {
-                              weakSelf.snippetLabel.text = [NSString stringWithFormat:@"%@ - %@", item.score ?: @"0", item.by];
+                              weakSelf.snippetLabel.text = [NSString stringWithFormat:@"%i - %@", item.score ?: 0, item.by];
                           }];
 
     [self.KVOController observe:self.model

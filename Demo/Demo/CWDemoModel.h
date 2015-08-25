@@ -13,7 +13,7 @@
 
 @interface CWDemoModel : CWModel
 
-@property (nonatomic, strong) NSString *score;
+@property (nonatomic, assign) NSInteger score;
 @property (nonatomic, strong) NSString *by;
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, strong) NSString *text;

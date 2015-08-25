@@ -50,16 +50,13 @@
             Class expectedClass = [self classExpectedByPropertyNamed:localPropertyName];
             
             if (![remoteValue isKindOfClass:expectedClass]) {
-
                 // Convert NSNumber => NSDate with assumption that NSNumber represents a JavaScript timestamp
-                if ([expectedClass isSubclassOfClass:NSDate.class] && [remoteValue isKindOfClass:NSNumber.class]) {
+                if ([expectedClass isSubclassOfClass:[NSDate class]] && [remoteValue isKindOfClass:[NSNumber class]]) {
                     remoteValue = [NSDate dateFromJavascriptTimestamp:remoteValue];
                 }
-                
-                if ([expectedClass isSubclassOfClass:NSString.class]) {
+                else if ([expectedClass isSubclassOfClass:[NSString class]]) {
                     remoteValue = [NSString stringWithFormat:@"%@", remoteValue];
                 }
-
             }
             
             [self setValue:remoteValue forKey:localPropertyName];
@@ -100,34 +97,36 @@
 
 - (Class)classExpectedByPropertyNamed:(NSString *)propertyName
 {
-	objc_property_t property = class_getProperty( self.class, [propertyName UTF8String] );
-	if ( property == NULL )
-		return ( NULL );
-
-    const char * attrs = property_getAttributes( property );
-	if ( attrs == NULL )
-		return ( NULL );
+    objc_property_t property = class_getProperty( self.class, [propertyName UTF8String] );
+    if ( property == NULL ) { return ( NULL ); }
     
-	static char buffer[256];
-	const char * e = strchr( attrs, ',' );
-	if ( e == NULL )
-		return ( NULL );
+    const char * type = property_getAttributes(property);
     
-	int len = (int)(e - attrs);
-	memcpy( buffer, attrs, len );
-	buffer[len] = '\0';
-
-    char *attribute = strtok(buffer, ",");
-    if (*attribute == 'T') attribute++; else attribute = NULL;
+    NSString * typeString = [NSString stringWithUTF8String:type];
+    NSArray * attributes = [typeString componentsSeparatedByString:@","];
+    NSString * typeAttribute = [attributes objectAtIndex:0];
+    NSString * propertyType = [typeAttribute substringFromIndex:1];
+    const char * rawPropertyType = [propertyType UTF8String];
     
-    if (attribute == NULL) return NSNull.class;
-
-    // At this point, buffer => T@"NSObject"
-    NSString *className = [[NSString alloc] initWithUTF8String:buffer];
-    className = [className substringWithRange:NSMakeRange(3, className.length - 4)];
-    Class class = NSClassFromString(className);
+    if (strcmp(rawPropertyType, @encode(float)) == 0) {
+        //it's a float
+    } else if (strcmp(rawPropertyType, @encode(int)) == 0) {
+        //it's an int
+    } else if (strcmp(rawPropertyType, @encode(id)) == 0) {
+        //it's some sort of object
+    } else {
+        // According to Apples Documentation you can determine the corresponding encoding values
+    }
     
-    return class;
+    if ([typeAttribute hasPrefix:@"T@"]) {
+        NSString * typeClassName = [typeAttribute substringWithRange:NSMakeRange(3, [typeAttribute length]-4)];  //turns @"NSDate" into NSDate
+        Class typeClass = NSClassFromString(typeClassName);
+        if (typeClass != nil) {
+            return typeClass;
+        }
+    }
+    
+    return nil;
 }
 
 @end

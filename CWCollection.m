@@ -252,7 +252,7 @@
     if ([self.delegate respondsToSelector:@selector(collectionDidChange:)]) {
         id delegate = self.delegate;
         [NSObject cancelPreviousPerformRequestsWithTarget:delegate selector:@selector(collectionDidChange:) object:self];
-        [delegate performSelector:@selector(collectionDidChange:) withObject:self afterDelay:0.01];
+        [delegate performSelector:@selector(collectionDidChange:) withObject:self afterDelay:0];
     }
 }
 
